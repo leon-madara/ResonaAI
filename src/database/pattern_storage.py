@@ -416,3 +416,115 @@ class PatternStorageService:
             'transcript': None,  # Encrypted, not returned
             'language': session.transcript_language
         }
+
+    # ========================================================================
+    # INTERFACE CONFIG METHODS
+    # ========================================================================
+
+    async def get_latest_interface_config(self, user_id: str) -> Optional[Dict]:
+        """
+        Get user's most recent interface configuration
+
+        Args:
+            user_id: User identifier
+
+        Returns:
+            Config dict or None
+        """
+        config = self.db.query(InterfaceConfig).filter(
+            and_(
+                InterfaceConfig.user_id == user_id,
+                InterfaceConfig.is_current == True
+            )
+        ).first()
+
+        if not config:
+            return None
+
+        return self._config_to_dict(config)
+
+    async def store_interface_config(
+        self,
+        user_id: str,
+        encrypted_config: str,
+        salt: str,
+        metadata: Dict
+    ) -> InterfaceConfig:
+        """
+        Store encrypted interface configuration
+
+        Args:
+            user_id: User identifier
+            encrypted_config: Encrypted UI config
+            salt: Encryption salt
+            metadata: Config metadata (risk_level, trajectory, etc.)
+
+        Returns:
+            InterfaceConfig record
+        """
+        # Get current version
+        current = self.db.query(InterfaceConfig).filter(
+            and_(
+                InterfaceConfig.user_id == user_id,
+                InterfaceConfig.is_current == True
+            )
+        ).first()
+
+        next_version = (current.version + 1) if current else 1
+
+        # Create new config record
+        config_record = InterfaceConfig(
+            user_id=user_id,
+            version=next_version,
+            ui_config_encrypted=encrypted_config,
+            encryption_salt=salt,
+            theme=metadata.get('theme'),
+            primary_components=metadata.get('primary_components', []),
+            hidden_components=metadata.get('hidden_components', []),
+            crisis_prominence=metadata.get('risk_level') in ['high', 'critical'],
+            is_current=True,
+            deployed=False
+        )
+
+        self.db.add(config_record)
+        self.db.commit()
+        self.db.refresh(config_record)
+
+        return config_record
+
+    async def store_interface_changes(
+        self,
+        user_id: str,
+        changes: List[Dict]
+    ) -> List[InterfaceChange]:
+        """
+        Store interface changes for user notification
+
+        Args:
+            user_id: User identifier
+            changes: List of change dictionaries
+
+        Returns:
+            List of InterfaceChange records
+        """
+        change_records = []
+
+        for change_data in changes:
+            change_record = InterfaceChange(
+                user_id=user_id,
+                change_type=change_data.get('change_type'),
+                component_affected=change_data.get('component'),
+                reason=change_data.get('reason'),
+                severity=change_data.get('severity', 'low'),
+                acknowledged=False
+            )
+
+            self.db.add(change_record)
+            change_records.append(change_record)
+
+        self.db.commit()
+
+        for record in change_records:
+            self.db.refresh(record)
+
+        return change_records
