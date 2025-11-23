@@ -1,0 +1,104 @@
+.typing-indicator {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.typing-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.typing-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.typing-bubble {
+  padding: 0.75rem 1rem;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  max-width: 120px;
+}
+
+.typing-dots {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #6b7280;
+}
+
+.typing-label {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: #9ca3af;
+  font-style: italic;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .typing-indicator {
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .typing-avatar {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .typing-bubble {
+    max-width: 100px;
+  }
+  
+  .dot {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .typing-label {
+    font-size: 0.7rem;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .typing-bubble {
+    background: #374151;
+    border-color: #4b5563;
+  }
+  
+  .dot {
+    background: #d1d5db;
+  }
+  
+  .typing-label {
+    color: #9ca3af;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .dot {
+    animation: none;
+    opacity: 0.7;
+  }
+}

@@ -1,0 +1,31 @@
+# Speech Processing Service Dependencies
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+python-multipart==0.0.6
+
+# Audio Processing
+librosa==0.10.1
+soundfile==0.12.1
+noisereduce==3.0.0
+webrtcvad==2.0.10
+
+# STT APIs
+openai==1.3.0
+azure-cognitiveservices-speech==1.34.0
+
+# Machine Learning
+numpy==1.24.4
+scipy==1.11.4
+scikit-learn==1.3.2
+
+# Utilities
+python-dotenv==1.0.0
+loguru==0.7.2
+pydantic-settings==2.1.0
+
+# Development
+pytest==7.4.3
+pytest-asyncio==0.21.1
+black==23.11.0
+flake8==6.1.0
