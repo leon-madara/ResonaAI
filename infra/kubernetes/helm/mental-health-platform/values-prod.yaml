@@ -1,0 +1,51 @@
+# Production environment values
+replicaCount: 3
+
+image:
+  tag: "latest"
+  pullPolicy: Always
+
+ingress:
+  enabled: true
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+
+resources:
+  requests:
+    cpu: 500m
+    memory: 1Gi
+  limits:
+    cpu: 1000m
+    memory: 2Gi
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 20
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+env:
+  ENVIRONMENT: production
+  LOG_LEVEL: INFO
+
+services:
+  api-gateway:
+    replicaCount: 3
+  speech-processing:
+    replicaCount: 3
+  emotion-analysis:
+    replicaCount: 3
+  conversation-engine:
+    replicaCount: 3
+  crisis-detection:
+    replicaCount: 3
+  safety-moderation:
+    replicaCount: 3
+  sync-service:
+    replicaCount: 2
+  cultural-context:
+    replicaCount: 2
+

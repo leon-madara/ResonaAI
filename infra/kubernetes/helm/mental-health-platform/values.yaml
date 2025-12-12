@@ -1,0 +1,118 @@
+# Default values for mental-health-platform
+# This is a YAML-formatted file.
+
+replicaCount: 2
+
+image:
+  registry: ghcr.io
+  repository: resonaai
+  pullPolicy: Always
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  hosts:
+    - host: mentalhealth.ke
+      paths:
+        - path: /api
+          pathType: Prefix
+  tls:
+    - secretName: mental-health-platform-tls
+      hosts:
+        - mentalhealth.ke
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    cpu: 500m
+    memory: 1Gi
+
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Services configuration
+services:
+  api-gateway:
+    enabled: true
+    replicaCount: 2
+  speech-processing:
+    enabled: true
+    replicaCount: 2
+  emotion-analysis:
+    enabled: true
+    replicaCount: 2
+  conversation-engine:
+    enabled: true
+    replicaCount: 2
+  crisis-detection:
+    enabled: true
+    replicaCount: 2
+  safety-moderation:
+    enabled: true
+    replicaCount: 2
+  sync-service:
+    enabled: true
+    replicaCount: 2
+  cultural-context:
+    enabled: true
+    replicaCount: 2
+
+# Database configuration
+database:
+  host: postgres-service
+  port: 5432
+  name: mental_health
+  user: postgres
+
+# Redis configuration
+redis:
+  host: redis-service
+  port: 6379
+
+# Environment variables
+env:
+  ENVIRONMENT: production
+  LOG_LEVEL: INFO
+

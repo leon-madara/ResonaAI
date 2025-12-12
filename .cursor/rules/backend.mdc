@@ -1,0 +1,94 @@
+# Backend Rules for ResonaAI
+
+## Technology Stack
+- **Language**: Python 3.11+
+- **Framework**: FastAPI
+- **Database**: PostgreSQL with SQLAlchemy
+- **Cache**: Redis
+- **Message Queue**: RabbitMQ (for async processing)
+- **Testing**: pytest
+
+## Code Style
+
+### Naming Conventions
+- **Files**: snake_case.py
+- **Classes**: PascalCase
+- **Functions/Variables**: snake_case
+- **Constants**: UPPER_SNAKE_CASE
+- **Private members**: _prefixed
+
+### Function Documentation
+```python
+def process_emotion(audio_data: bytes, user_id: str) -> EmotionResult:
+    """
+    Analyze emotional content from audio input.
+    
+    Args:
+        audio_data: Raw audio bytes from voice recording
+        user_id: Unique identifier for the user
+        
+    Returns:
+        EmotionResult containing detected emotions and confidence scores
+        
+    Raises:
+        AudioProcessingError: If audio format is invalid
+        UserNotFoundError: If user_id doesn't exist
+    """
+```
+
+## API Design
+
+### Endpoint Conventions
+- Use plural nouns for resources: `/users`, `/sessions`, `/emotions`
+- Use HTTP verbs correctly: GET (read), POST (create), PUT (update), DELETE (remove)
+- Version APIs: `/api/v1/...`
+- Return appropriate status codes
+
+### Response Format
+```python
+{
+    "success": true,
+    "data": { ... },
+    "meta": {
+        "timestamp": "2024-01-01T00:00:00Z",
+        "request_id": "uuid"
+    }
+}
+```
+
+### Error Response Format
+```python
+{
+    "success": false,
+    "error": {
+        "code": "VALIDATION_ERROR",
+        "message": "User-friendly message",
+        "details": { ... }  # Optional debugging info
+    }
+}
+```
+
+## Microservice Guidelines
+
+### Service Independence
+- Each service should be independently deployable
+- Use async communication for non-critical paths
+- Implement circuit breakers for external calls
+- Each service owns its data
+
+### Service Communication
+- REST for synchronous request/response
+- Message queues for async events
+- gRPC for high-performance internal calls
+
+## Database Rules
+- Always use migrations for schema changes
+- Index foreign keys and frequently queried columns
+- Use connection pooling
+- Implement soft deletes for audit trail
+
+## Security Requirements
+- Validate all inputs with Pydantic models
+- Use dependency injection for authentication
+- Rate limit all public endpoints
+- Log security events (auth failures, permission denials)

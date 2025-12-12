@@ -24,34 +24,34 @@ ResonaAI is a comprehensive voice-first mental health support platform specifica
 - 🚨 **Crisis Detection**: Multi-layer safety system with human escalation pathways
 - 🏥 **Healthcare Compliant**: Adheres to digital health regulations and ethical AI frameworks
 
-## ✨ Features
+## 📁 Project Structure
 
-### Core Capabilities
+```
+ResonaAI/
+├── apps/                    # Application code (monorepo)
+│   ├── backend/             # Python services
+│   │   ├── core/            # Shared modules
+│   │   ├── gateway/         # API Gateway
+│   │   └── services/        # 15 microservices
+│   └── frontend/            # React web app
+├── tests/                   # Test suites
+├── infra/                   # Infrastructure as Code
+│   ├── docker/              # Docker configs
+│   ├── kubernetes/          # K8s manifests
+│   └── terraform/           # Cloud infrastructure
+├── docs/                    # Documentation
+├── project/                 # Project management
+└── monitoring/              # Observability stack
+```
 
-- **Real-time Emotion Detection**: Analyze emotional states from voice input in real-time
-- **Speech-to-Text Processing**: Convert voice to text with accent adaptation for East African English and Swahili
-- **AI Conversation Engine**: GPT-4 powered empathetic responses with cultural context awareness
-- **Crisis Detection & Safety**: Multi-layer risk assessment with automatic human escalation
-- **Offline Functionality**: Complete offline support with encrypted local storage and sync
-- **Multi-language Support**: English and Swahili with regional accent adaptation
-
-### Technical Features
-
-- **Microservices Architecture**: Scalable, containerized services
-- **REST & WebSocket APIs**: Real-time streaming and batch processing
-- **Progressive Web App**: Installable PWA with offline capabilities
-- **Docker Deployment**: Complete containerization with Docker Compose
-- **Comprehensive Testing**: Unit, integration, and performance tests
-- **Monitoring & Observability**: Prometheus, Grafana, and ELK stack integration
+See [STRUCTURE.md](STRUCTURE.md) for detailed project organization.
 
 ## 🏗️ Architecture
-
-### System Components
 
 ```
 ┌─────────────────────────────────────────────────────────┐
 │              User Interface Layer                        │
-│  Web App (PWA) │ Mobile App │ Counselor Dashboard      │
+│  Web App (PWA) │ Mobile App │ Counselor Dashboard       │
 └─────────────────────────────────────────────────────────┘
                         │
 ┌─────────────────────────────────────────────────────────┐
@@ -60,7 +60,7 @@ ResonaAI is a comprehensive voice-first mental health support platform specifica
 └─────────────────────────────────────────────────────────┘
                         │
 ┌─────────────────────────────────────────────────────────┐
-│              Microservices Layer                        │
+│              Microservices Layer (15 services)          │
 │  Speech Processing │ Emotion Analysis │ Conversation   │
 │  Crisis Detection  │ Safety Filters   │ Cultural Context│
 └─────────────────────────────────────────────────────────┘
@@ -71,17 +71,6 @@ ResonaAI is a comprehensive voice-first mental health support platform specifica
 └─────────────────────────────────────────────────────────┘
 ```
 
-### Microservices
-
-1. **API Gateway Service** - Authentication, rate limiting, request routing
-2. **Speech Processing Service** - STT with East African accent adaptation
-3. **Emotion Analysis Service** - Voice and text emotion detection
-4. **Conversation Engine Service** - AI response generation with cultural context
-5. **Crisis Detection Service** - Risk assessment and escalation
-6. **Safety & Content Moderation** - Response validation and filtering
-7. **Sync Service** - Offline data synchronization
-8. **Cultural Context Service** - Cultural knowledge and bias mitigation
-
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -89,8 +78,6 @@ ResonaAI is a comprehensive voice-first mental health support platform specifica
 - Python 3.8+
 - Node.js 18+
 - Docker & Docker Compose
-- PostgreSQL 15+
-- Redis 7+
 
 ### Installation
 
@@ -106,157 +93,91 @@ ResonaAI is a comprehensive voice-first mental health support platform specifica
    # Edit .env with your configuration
    ```
 
-3. **Install Python dependencies**
+3. **Install dependencies**
    ```bash
+   # Backend
    pip install -r requirements.txt
-   ```
-
-4. **Install web app dependencies**
-   ```bash
-   cd web-app
+   
+   # Frontend
+   cd apps/frontend
    npm install
-   cd ..
    ```
 
-5. **Run with Docker Compose**
+4. **Run with Docker Compose**
    ```bash
+   cd infra/docker
    docker-compose up -d
    ```
 
-### Development Setup
+### Development
 
-1. **Run the API server**
-   ```bash
-   uvicorn main:app --reload --host 0.0.0.0 --port 8000
-   ```
+```bash
+# Run API Gateway
+cd apps/backend/gateway
+uvicorn main:app --reload --port 8000
 
-2. **Run the web app**
-   ```bash
-   cd web-app
-   npm start
-   ```
+# Run Frontend
+cd apps/frontend
+npm start
 
-3. **Access API documentation**
-   - Swagger UI: `http://localhost:8000/docs`
-   - ReDoc: `http://localhost:8000/redoc`
+# Run Tests
+pytest tests/ -v
+```
+
+### Using Makefile
+
+```bash
+make help          # Show all commands
+make install       # Install all dependencies
+make dev           # Start development servers
+make test          # Run all tests
+make docker-up     # Start Docker containers
+```
 
 ## 📡 API Endpoints
 
 ### Emotion Detection
-
-- `POST /detect-emotion/file` - Analyze emotion from uploaded audio file
-- `POST /detect-emotion/batch` - Batch process multiple audio files
-- `POST /detect-emotion/stream` - Real-time emotion detection
-- `WebSocket /ws/emotion-stream` - WebSocket streaming for live applications
+- `POST /detect-emotion/file` - Analyze emotion from audio file
+- `POST /detect-emotion/batch` - Batch process multiple files
+- `WebSocket /ws/emotion-stream` - Real-time streaming
 
 ### Speech Processing
-
-- `POST /transcribe` - Convert speech to text with accent adaptation
-- `POST /transcribe-stream` - Real-time speech-to-text
+- `POST /transcribe` - Speech-to-text with accent adaptation
 - `POST /detect-language` - Automatic language detection
 
-### Health & Status
-
+### Health
 - `GET /health` - System health check
-
-## 💻 Usage Examples
-
-### Python Client
-
-```python
-import requests
-
-# Analyze emotion from audio file
-with open('audio.wav', 'rb') as f:
-    response = requests.post(
-        'http://localhost:8000/detect-emotion/file',
-        files={'file': f}
-    )
-    result = response.json()
-    print(f"Emotion: {result['emotion']}")
-    print(f"Confidence: {result['confidence']:.2f}")
-```
-
-### JavaScript/WebSocket
-
-```javascript
-const ws = new WebSocket('ws://localhost:8000/ws/emotion-stream');
-
-ws.onmessage = function(event) {
-    const result = JSON.parse(event.data);
-    console.log(`Emotion: ${result.emotion}`);
-    console.log(`Confidence: ${result.confidence}`);
-};
-```
 
 ## 🔒 Security & Privacy
 
-### Data Protection
+- **Encryption**: AES-256 at rest, TLS 1.3 in transit
+- **Compliance**: Kenya Data Protection Act 2019
+- **Data Sovereignty**: African region storage
+- **Consent Management**: GDPR-style user rights
 
-- **Encryption**: AES-256 encryption for data at rest, TLS 1.3 for data in transit
-- **Compliance**: Full compliance with Kenya Data Protection Act 2019
-- **Data Sovereignty**: Primary data storage in Kenya/South Africa regions
-- **Anonymization**: PII removal before external API calls
-- **Consent Management**: Granular consent tracking and user rights
+## 📚 Documentation
 
-### Security Features
-
-- JWT authentication with short expiration times
-- Multi-factor authentication for counselors and admins
-- Role-based access control (RBAC)
-- End-to-end encryption for sensitive conversations
-- Secure key management with AWS KMS/Azure Key Vault
+| Document | Description |
+|----------|-------------|
+| [Quick Start Guide](docs/guides/QUICK_START_GUIDE.md) | Get started quickly |
+| [System Design](docs/architecture/system-design.md) | Architecture overview |
+| [API Reference](docs/api/API.md) | Complete API docs |
+| [Deployment Guide](docs/runbooks/deployment-checklist.md) | Deploy to production |
 
 ## 🧪 Testing
 
 ```bash
 # Run all tests
-pytest tests/
+pytest tests/ -v
 
 # Run with coverage
-pytest --cov=src tests/
+pytest tests/ --cov=apps/backend --cov-report=html
 
-# Run specific test file
-pytest tests/test_emotion_detector.py
+# Run specific service tests
+pytest tests/services/emotion-analysis/ -v
 ```
 
-## 📚 Documentation
-
-- [API Documentation](docs/API.md) - Complete API reference
-- [Architecture Documentation](docs/ARCHITECTURE.md) - System architecture details
-- [System Design](architecture/system-design.md) - Comprehensive system design
-- [Compliance Documentation](docs/compliance/) - Data protection and compliance
-
-## 🌍 Cultural Sensitivity
-
-ResonaAI is designed with East African cultural context in mind:
-
-- **Language Support**: English and Swahili with regional accents
-- **Cultural Knowledge Base**: RAG-powered cultural context integration
-- **Bias Detection**: Regular audits for algorithmic bias
-- **Local Resources**: Integration with East African mental health resources
-- **Cultural Advisory**: Feedback from cultural advisory board
-
-## 🚨 Crisis Support
-
-The platform includes comprehensive crisis detection and intervention:
-
-- **Multi-layer Detection**: Keyword, sentiment, and LLM-based analysis
-- **Risk Scoring**: Automated risk assessment and prioritization
-- **Human Escalation**: Automatic routing to human counselors
-- **Emergency Resources**: Integration with local emergency services
-- **24/7 Monitoring**: Continuous safety monitoring and alerting
-
-## 📊 Monitoring & Observability
-
-- **Application Monitoring**: Prometheus + Grafana
-- **Logging**: ELK Stack (Elasticsearch, Logstash, Kibana)
-- **Tracing**: Distributed tracing with Jaeger
-- **Alerting**: PagerDuty integration for critical alerts
-
 ## 🤝 Contributing
-
-Contributions are welcome! Please read our contributing guidelines before submitting pull requests.
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
@@ -268,25 +189,10 @@ Contributions are welcome! Please read our contributing guidelines before submit
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 🙏 Acknowledgments
-
-- OpenAI for GPT-4 API
-- Azure Cognitive Services for speech processing
-- Hume AI for emotion detection
-- The East African mental health community for guidance and feedback
-
-## 📞 Contact & Support
-
-For questions, support, or collaboration opportunities:
-
-- **GitHub Issues**: [Open an issue](https://github.com/leon-madara/ResonaAI/issues)
-- **Documentation**: See the [docs](docs/) directory
-
 ## 🗺️ Roadmap
 
 - [ ] Mobile app (React Native/Flutter)
-- [ ] Self-hosted AI models for reduced latency
-- [ ] Multi-modal input (voice, text, images)
+- [ ] Self-hosted AI models
 - [ ] Group therapy sessions
 - [ ] Wearable device integration
 - [ ] Advanced analytics dashboard

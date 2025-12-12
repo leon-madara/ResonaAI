@@ -1,0 +1,109 @@
+# Frontend Rules for ResonaAI
+
+## Technology Stack
+- **Framework**: React 18+ with TypeScript
+- **Build Tool**: Vite or Create React App
+- **State Management**: Context API + Custom Hooks
+- **Styling**: CSS Modules or styled-components
+- **Testing**: Jest + React Testing Library
+
+## Code Style
+
+### Naming Conventions
+- **Components**: PascalCase.tsx
+- **Hooks**: useCamelCase.ts
+- **Utilities**: camelCase.ts
+- **Styles**: ComponentName.css or ComponentName.module.css
+- **Types/Interfaces**: PascalCase (prefix with I for interfaces if needed)
+
+### Component Structure
+```typescript
+// 1. Imports
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { Button } from '../components/UI';
+import styles from './ComponentName.module.css';
+
+// 2. Types
+interface ComponentNameProps {
+  title: string;
+  onAction: (id: string) => void;
+}
+
+// 3. Component
+export const ComponentName: React.FC<ComponentNameProps> = ({ 
+  title, 
+  onAction 
+}) => {
+  // 3a. Hooks
+  const [state, setState] = useState<string>('');
+  const { user } = useAuth();
+  
+  // 3b. Effects
+  useEffect(() => {
+    // Effect logic
+  }, [dependency]);
+  
+  // 3c. Handlers
+  const handleClick = () => {
+    onAction(state);
+  };
+  
+  // 3d. Render
+  return (
+    <div className={styles.container}>
+      <h1>{title}</h1>
+      <Button onClick={handleClick}>Action</Button>
+    </div>
+  );
+};
+```
+
+## Folder Structure
+```
+src/
+├── components/          # Reusable UI components
+│   ├── UI/              # Base components (Button, Input, etc.)
+│   ├── Layout/          # Layout components
+│   └── [Feature]/       # Feature-specific components
+├── contexts/            # React contexts
+├── hooks/               # Custom hooks
+├── pages/               # Page components (routes)
+├── utils/               # Utility functions
+├── types/               # TypeScript types/interfaces
+├── styles/              # Global styles
+└── services/            # API service layer
+```
+
+## State Management Rules
+- Use Context for global state (auth, theme, user preferences)
+- Use local state for component-specific data
+- Avoid prop drilling beyond 2 levels
+- Memoize expensive computations with useMemo
+- Memoize callbacks with useCallback when passed to children
+
+## Accessibility Requirements
+- All interactive elements must be keyboard accessible
+- Use semantic HTML elements
+- Provide alt text for images
+- Ensure sufficient color contrast (WCAG AA)
+- Support screen readers with ARIA labels
+
+## Performance Guidelines
+- Lazy load routes and heavy components
+- Optimize images and assets
+- Minimize re-renders with proper dependency arrays
+- Use React.memo for pure components
+- Implement virtualization for long lists
+
+## Error Handling
+- Use ErrorBoundary for component errors
+- Show user-friendly error messages
+- Implement retry mechanisms for failed API calls
+- Log errors to monitoring service
+
+## Testing Requirements
+- Test user interactions, not implementation
+- Test accessibility with jest-axe
+- Mock API calls in tests
+- Aim for 80%+ coverage on critical paths

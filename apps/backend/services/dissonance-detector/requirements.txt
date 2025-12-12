@@ -1,0 +1,18 @@
+# FastAPI
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+
+# Authentication
+python-jose[cryptography]==3.3.0
+
+# ML/NLP
+transformers==4.36.0
+torch==2.1.1
+sentencepiece==0.1.99
+
+# Utilities
+python-dotenv==1.0.0
+loguru==0.7.2
+pydantic-settings==2.1.0
+

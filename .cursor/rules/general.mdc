@@ -1,0 +1,56 @@
+# General Coding Rules for ResonaAI
+
+## Project Context
+ResonaAI is a mental health support platform with voice-based AI therapy assistance. This is a sensitive healthcare application requiring strict attention to security, privacy, and reliability.
+
+## Core Principles
+
+### 1. Code Quality
+- Write self-documenting code with clear naming conventions
+- Comment all public functions with purpose, inputs, outputs
+- Keep functions small and focused (single responsibility)
+- Use TypeScript for frontend, Python with type hints for backend
+
+### 2. Security-First
+- Never log sensitive user data (PII, health information)
+- Always validate and sanitize inputs
+- Use parameterized queries for database operations
+- Encrypt sensitive data at rest and in transit
+
+### 3. Error Handling
+- Implement comprehensive error handling at all layers
+- Use consistent error response formats
+- Log errors with appropriate detail for debugging
+- Never expose internal errors to users
+
+### 4. Performance
+- API responses should be <200ms (95th percentile)
+- Database queries should be <50ms (95th percentile)
+- Optimize resource usage and efficiency
+- Use appropriate caching strategies
+
+## File Organization
+- Follow the monorepo structure: `apps/backend/`, `apps/frontend/`
+- Tests mirror source structure in `tests/`
+- Documentation in `docs/` with logical subfolders
+- Infrastructure code in `infra/`
+
+## Import Ordering
+### Python
+1. Standard library
+2. Third-party packages
+3. Local imports (absolute)
+4. Local imports (relative)
+
+### TypeScript/React
+1. React/Next imports
+2. Third-party packages
+3. Local components
+4. Local utilities
+5. Styles
+
+## Commit Messages
+Format: `<type>(<scope>): <description>`
+
+Types: feat, fix, docs, style, refactor, test, chore
+Scopes: backend, frontend, infra, docs, tests

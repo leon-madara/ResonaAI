@@ -1,0 +1,42 @@
+# Development environment values
+replicaCount: 1
+
+image:
+  tag: "dev"
+
+ingress:
+  enabled: false
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 250m
+    memory: 512Mi
+
+autoscaling:
+  enabled: false
+
+env:
+  ENVIRONMENT: development
+  LOG_LEVEL: DEBUG
+
+services:
+  api-gateway:
+    replicaCount: 1
+  speech-processing:
+    replicaCount: 1
+  emotion-analysis:
+    replicaCount: 1
+  conversation-engine:
+    replicaCount: 1
+  crisis-detection:
+    replicaCount: 1
+  safety-moderation:
+    replicaCount: 1
+  sync-service:
+    replicaCount: 1
+  cultural-context:
+    replicaCount: 1
+

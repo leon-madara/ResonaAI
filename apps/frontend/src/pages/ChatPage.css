@@ -1,0 +1,142 @@
+.chat-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  height: calc(100vh - 4rem);
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.dark .chat-header {
+  border-bottom-color: #374151;
+}
+
+.chat-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.dark .chat-title {
+  color: #f9fafb;
+}
+
+.connection-status {
+  display: flex;
+  align-items: center;
+}
+
+.status-online,
+.status-offline {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.status-online {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.dark .status-online {
+  background: #064e3b;
+  color: #6ee7b7;
+}
+
+.status-offline {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.dark .status-offline {
+  background: #7f1d1d;
+  color: #fca5a5;
+}
+
+.emotion-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: #eff6ff;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.dark .emotion-indicator {
+  background: #1e3a8a;
+}
+
+.emotion-label {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.dark .emotion-label {
+  color: #9ca3af;
+}
+
+.emotion-value {
+  color: #2563eb;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.dark .emotion-value {
+  color: #93c5fd;
+}
+
+.emotion-confidence {
+  color: #6b7280;
+  font-size: 0.75rem;
+}
+
+.dark .emotion-confidence {
+  color: #9ca3af;
+}
+
+.chat-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  overflow: hidden;
+}
+
+.recorder-section {
+  padding: 1rem;
+  background: white;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+}
+
+.dark .recorder-section {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+@media (max-width: 768px) {
+  .chat-page {
+    height: calc(100vh - 2rem);
+  }
+
+  .chat-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+}
+

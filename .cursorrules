@@ -1,0 +1,282 @@
+# ResonaAI Project Rules for Cursor AI
+
+## Mandatory Documentation Workflow
+
+### Rule 1: Planning Phase (REQUIRED BEFORE ANY WORK)
+
+**BEFORE starting any implementation, feature development, or significant changes:**
+
+1. **Create a Plan Document** in `ResonaAI/Plans/` folder
+   - File naming: `YY-MM-DD-{descriptive-name}.md` or `{phase}-{feature-name}.md`
+   - Location: Place in appropriate phase folder:
+     - `Plans/Phase1-Foundation/` - Frontend, Auth, Database
+     - `Plans/Phase2-CoreInnovation/` - Dissonance Detector, Core features
+     - `Plans/Phase3-Personalization/` - Baseline Tracker, Personalization
+     - `Plans/Phase4-Microservices/` - Service implementations
+     - `Plans/Phase5-AdvancedFeatures/` - Advanced features
+     - `Plans/Phase6-Testing/` - Testing and QA
+     - `Plans/Active/` - Currently active plans
+   
+2. **Plan Document Must Include:**
+   - **Overview**: What will be implemented
+   - **Objectives**: Clear goals and success criteria
+   - **Scope**: What's included and excluded
+   - **Implementation Steps**: Detailed task breakdown
+   - **Dependencies**: What needs to be completed first
+   - **Files to Create/Modify**: List of all affected files
+   - **Testing Strategy**: How it will be tested
+   - **Timeline**: Estimated duration
+   - **Risks & Mitigation**: Potential issues and solutions
+
+3. **Example Plan Structure:**
+   ```markdown
+   # Plan: [Feature Name]
+   
+   ## Overview
+   [Description]
+   
+   ## Objectives
+   - [ ] Objective 1
+   - [ ] Objective 2
+   
+   ## Implementation Steps
+   1. Step 1
+   2. Step 2
+   
+   ## Files to Create/Modify
+   - `path/to/file1.tsx`
+   - `path/to/file2.py`
+   
+   ## Testing
+   - Unit tests: [ ]
+   - Integration tests: [ ]
+   
+   ## Timeline
+   Estimated: X days/weeks
+   ```
+
+4. **Move to Active**: Once plan is created, move or reference it in `Plans/Active/` if it's the current work
+
+### Rule 2: Progress Reporting Phase (REQUIRED AFTER COMPLETION)
+
+**AFTER completing any implementation, feature, or significant change:**
+
+1. **Create a Progress Report** in `ResonaAI/Progress Report/` folder
+   - File naming: `YY-MM-DD-{feature-name}-Completion.md` or `{phase}-{feature-name}-Report.md`
+   - Location: `ResonaAI/Progress Report/`
+   
+2. **Progress Report Must Include:**
+   - **Completion Summary**: What was accomplished
+   - **Files Created/Modified**: Complete list with line counts
+   - **Implementation Details**: Technical details of what was built
+   - **Testing Status**: What was tested and results
+   - **Issues Encountered**: Problems faced and solutions
+   - **Lessons Learned**: Key takeaways
+   - **Next Steps**: What needs to happen next
+   - **Completion Date**: When work was finished
+   - **Completion Percentage**: % complete (if partial)
+
+3. **Example Progress Report Structure:**
+   ```markdown
+   # Progress Report: [Feature Name]
+   
+   **Date**: YYYY-MM-DD
+   **Status**: Complete / In Progress / Blocked
+   **Completion**: X%
+   
+   ## Summary
+   [What was accomplished]
+   
+   ## Files Created
+   - `path/to/file1.tsx` (X lines)
+   - `path/to/file2.py` (Y lines)
+   
+   ## Files Modified
+   - `path/to/file3.tsx` (changes made)
+   
+   ## Implementation Details
+   [Technical details]
+   
+   ## Testing
+   - [ ] Unit tests written
+   - [ ] Integration tests written
+   - [ ] Manual testing completed
+   
+   ## Issues & Solutions
+   - Issue 1: [Description] → Solution: [How it was fixed]
+   
+   ## Lessons Learned
+   - [Key takeaway 1]
+   - [Key takeaway 2]
+   
+   ## Next Steps
+   - [ ] Next action item 1
+   - [ ] Next action item 2
+   ```
+
+### Rule 3: Workflow Enforcement
+
+**For EVERY task, feature, or change:**
+
+1. **START**: Create plan document first
+   - ✅ Plan document exists in `Plans/` folder
+   - ✅ Plan is reviewed and approved (if needed)
+   - ✅ Plan is moved to `Plans/Active/` if starting work
+
+2. **DURING**: Update plan document as needed
+   - Update task checkboxes as work progresses
+   - Note any scope changes
+   - Document blockers or issues
+
+3. **COMPLETE**: Create progress report
+   - ✅ Progress report created in `Progress Report/` folder
+   - ✅ All sections filled out
+   - ✅ Plan moved to `Plans/Completed/` (if fully done)
+   - ✅ Update main `Progress Report/README.md` if significant
+
+### Rule 4: Plan Document Updates
+
+**When updating plans:**
+
+- Mark completed tasks with `[x]`
+- Add notes for blockers with `⚠️ BLOCKED: [reason]`
+- Update timeline if delays occur
+- Document scope changes
+- Keep plan document current
+
+### Rule 5: Progress Report Standards
+
+**Progress reports must be:**
+- Honest about completion status
+- Detailed about what was actually done
+- Clear about what remains
+- Actionable for next steps
+- Linked to original plan document
+
+### Rule 6: File Organization
+
+**Plans Folder Structure:**
+```
+Plans/
+├── Active/              # Currently being worked on
+├── Completed/           # Finished plans
+├── Phase1-Foundation/
+├── Phase2-CoreInnovation/
+├── Phase3-Personalization/
+├── Phase4-Microservices/
+├── Phase5-AdvancedFeatures/
+└── Phase6-Testing/
+```
+
+**Progress Report Folder Structure:**
+```
+Progress Report/
+├── README.md                    # Main index
+├── Implementation-Details.md    # Technical deep dive
+├── File-Manifest.md             # Complete file list
+├── Next-Steps.md                # Roadmap
+└── [feature]-Completion.md       # Individual reports
+```
+
+### Rule 7: Exceptions
+
+**These changes DO NOT require full plan/report:**
+- Minor bug fixes (< 10 lines changed)
+- Documentation-only updates
+- Configuration file adjustments
+- Dependency updates
+- Code formatting/refactoring (unless major)
+
+**For exceptions, use simplified format:**
+- Quick note in relevant plan document
+- Or brief entry in `Progress Report/README.md`
+
+### Rule 8: Plan Review Process
+
+**Before starting implementation:**
+1. Review existing plans in `Plans/Active/` to avoid duplication
+2. Check `Plans/Completed/` for similar work
+3. Verify dependencies are met
+4. Confirm scope is clear
+5. Get approval if required (for major features)
+
+### Rule 9: Progress Report Integration
+
+**After creating progress report:**
+1. Update main `Progress Report/README.md` with summary
+2. Update `Progress Report/File-Manifest.md` if new files created
+3. Update `Progress Report/Implementation-Details.md` if technical details added
+4. Update `Progress Report/Next-Steps.md` if roadmap changes
+5. Link progress report to original plan document
+
+### Rule 10: Quality Standards
+
+**Plan documents must:**
+- Be clear and actionable
+- Include acceptance criteria
+- List all dependencies
+- Have realistic timelines
+- Be reviewed before starting
+
+**Progress reports must:**
+- Accurately reflect what was done
+- Include all created/modified files
+- Document issues and solutions
+- Provide clear next steps
+- Be honest about completion status
+
+## Enforcement
+
+**Cursor AI must:**
+1. ✅ ALWAYS create a plan document before starting work
+2. ✅ ALWAYS create a progress report after completing work
+3. ✅ NEVER skip documentation steps
+4. ✅ ALWAYS update existing plans if scope changes
+5. ✅ ALWAYS link progress reports to original plans
+
+**When user requests work:**
+1. First: Check if plan exists in `Plans/` folder
+2. If no plan: Create plan document FIRST
+3. Then: Proceed with implementation
+4. After: Create progress report
+5. Finally: Update main progress report index
+
+## Examples
+
+### Example 1: New Feature Implementation
+```
+User: "Implement user profile editing"
+
+AI Response:
+1. Creates: Plans/Phase1-Foundation/User-Profile-Editing.md
+2. Implements feature
+3. Creates: Progress Report/User-Profile-Editing-Completion.md
+4. Updates: Progress Report/README.md
+```
+
+### Example 2: Service Implementation
+```
+User: "Build the Cultural Context service"
+
+AI Response:
+1. Creates: Plans/Phase4-Microservices/Cultural-Context-Service.md
+2. Moves to: Plans/Active/Cultural-Context-Service.md
+3. Implements service
+4. Creates: Progress Report/Cultural-Context-Service-Completion.md
+5. Moves plan to: Plans/Completed/Cultural-Context-Service.md
+```
+
+## Reminders
+
+- **No work without a plan** - Always create plan document first
+- **No completion without a report** - Always create progress report after
+- **Keep documentation current** - Update plans as work progresses
+- **Link everything** - Connect plans to reports, reports to plans
+- **Be thorough** - Detailed documentation helps future development
+
+---
+
+**Last Updated**: December 12, 2025  
+**Version**: 1.0  
+**Status**: Active
+

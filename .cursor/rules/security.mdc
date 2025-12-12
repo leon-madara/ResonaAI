@@ -1,0 +1,138 @@
+# Security Rules for ResonaAI
+
+## Critical Context
+ResonaAI handles sensitive mental health data. Security breaches could cause severe harm to users. Apply maximum security standards at all times.
+
+## Data Classification
+
+### Level 1: Public
+- Marketing content
+- Public documentation
+- Non-sensitive configuration
+
+### Level 2: Internal
+- System logs (sanitized)
+- Aggregated analytics
+- Internal documentation
+
+### Level 3: Confidential
+- User profiles
+- Session metadata
+- System credentials
+
+### Level 4: Restricted (PHI/PII)
+- Mental health conversations
+- Voice recordings
+- Emotional analysis data
+- Personal identifiable information
+
+## Authentication & Authorization
+
+### Authentication Rules
+- Implement MFA for all user accounts
+- Use secure session management (HttpOnly, Secure, SameSite cookies)
+- Implement account lockout after failed attempts
+- Use strong password policies (12+ chars, complexity requirements)
+- Support passwordless authentication options
+
+### Authorization Rules
+- Implement role-based access control (RBAC)
+- Apply principle of least privilege
+- Validate permissions on every request
+- Log all authorization failures
+- Implement resource-level permissions
+
+## Data Protection
+
+### Encryption Requirements
+- TLS 1.3 for all data in transit
+- AES-256 for data at rest
+- End-to-end encryption for voice data
+- Encrypt all Level 3-4 data in database
+- Secure key management with rotation
+
+### Data Handling
+- Never log Level 4 data
+- Anonymize data before analytics
+- Implement data retention policies
+- Support right to deletion (GDPR)
+- Audit trail for all data access
+
+## Input Validation
+
+### Validation Rules
+- Validate all inputs on both client and server
+- Use allowlists over denylists
+- Sanitize all outputs (prevent XSS)
+- Use parameterized queries (prevent SQL injection)
+- Validate file uploads (type, size, content)
+
+### Common Attack Prevention
+```python
+# SQL Injection - Use parameterized queries
+cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+
+# XSS - Escape outputs
+from markupsafe import escape
+output = escape(user_input)
+
+# CSRF - Use tokens
+@app.route('/api/action', methods=['POST'])
+@csrf_protect
+def protected_action():
+    ...
+```
+
+## API Security
+
+### Rate Limiting
+- 100 requests/minute for authenticated users
+- 20 requests/minute for unauthenticated
+- Stricter limits on sensitive endpoints
+- Implement exponential backoff
+
+### Headers
+```python
+# Required security headers
+{
+    "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "X-XSS-Protection": "1; mode=block",
+    "Content-Security-Policy": "default-src 'self'",
+    "Referrer-Policy": "strict-origin-when-cross-origin"
+}
+```
+
+## Incident Response
+
+### Security Event Logging
+Log these events for security monitoring:
+- Authentication attempts (success/failure)
+- Authorization failures
+- Input validation failures
+- Rate limit violations
+- Data access to Level 4 resources
+- Configuration changes
+
+### Response Procedures
+1. **Detect**: Automated monitoring and alerts
+2. **Contain**: Isolate affected systems
+3. **Eradicate**: Remove threat
+4. **Recover**: Restore services
+5. **Learn**: Post-incident review
+
+## Compliance Requirements
+
+### Kenya DPA Compliance
+- Obtain explicit consent for data processing
+- Implement data subject access requests
+- Maintain processing records
+- Report breaches within 72 hours
+- Appoint Data Protection Officer
+
+### Healthcare Standards
+- Follow HIPAA-equivalent guidelines
+- Implement audit logging
+- Ensure business associate agreements
+- Regular security assessments

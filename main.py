@@ -3,7 +3,7 @@ ResonaAI - Voice Emotion Detection Pipeline
 Main FastAPI application entry point
 """
 
-from fastapi import FastAPI, File, UploadFile, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, File, UploadFile, WebSocket, WebSocketDisconnect, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import uvicorn
@@ -13,6 +13,7 @@ import logging
 from typing import List, Dict, Any
 import numpy as np
 from loguru import logger
+import inspect
 
 from src.audio_processor import AudioProcessor
 from src.emotion_detector import EmotionDetector
@@ -46,6 +47,16 @@ audio_processor = AudioProcessor()
 emotion_detector = EmotionDetector()
 streaming_processor = StreamingProcessor(audio_processor, emotion_detector)
 
+async def _maybe_await(value):
+    """
+    Await a value if it's awaitable, otherwise return it as-is.
+
+    This makes it easier to patch async dependencies in tests using plain mocks.
+    """
+    if inspect.isawaitable(value):
+        return await value
+    return value
+
 @app.on_event("startup")
 async def startup_event():
     """Initialize models and components on startup"""
@@ -75,7 +86,7 @@ async def detect_emotion_from_file(file: UploadFile = File(...)):
         processed_audio = audio_processor.preprocess_audio(audio_data)
         
         # Detect emotion
-        emotion_result = await emotion_detector.detect_emotion(processed_audio)
+        emotion_result = await _maybe_await(emotion_detector.detect_emotion(processed_audio))
         
         logger.info(f"Emotion detected: {emotion_result.emotion} (confidence: {emotion_result.confidence:.2f})")
         
@@ -95,6 +106,7 @@ async def detect_emotion_batch(files: List[UploadFile] = File(...)):
     """
     try:
         results = []
+        errors = []
         
         for file in files:
             try:
@@ -105,7 +117,7 @@ async def detect_emotion_batch(files: List[UploadFile] = File(...)):
                 processed_audio = audio_processor.preprocess_audio(audio_data)
                 
                 # Detect emotion
-                emotion_result = await emotion_detector.detect_emotion(processed_audio)
+                emotion_result = await _maybe_await(emotion_detector.detect_emotion(processed_audio))
                 
                 results.append({
                     "filename": file.filename,
@@ -120,6 +132,14 @@ async def detect_emotion_batch(files: List[UploadFile] = File(...)):
                     "filename": file.filename,
                     "error": str(e)
                 })
+                errors.append({"filename": file.filename, "error": str(e)})
+
+        if errors:
+            # For now, fail the whole batch if any file fails (matches current tests).
+            return JSONResponse(
+                status_code=500,
+                content={"error": "Failed to process one or more files", "results": results},
+            )
         
         return BatchEmotionResult(
             total_files=len(files),
@@ -148,13 +168,13 @@ async def websocket_emotion_stream(websocket: WebSocket):
             data = await websocket.receive_bytes()
             
             # Process audio chunk
-            emotion_result = await streaming_processor.process_audio_chunk(data)
+            emotion_result = await _maybe_await(streaming_processor.process_audio_chunk(data))
             
             # Send result back
             await websocket.send_text(json.dumps({
                 "emotion": emotion_result.emotion,
                 "confidence": emotion_result.confidence,
-                "timestamp": emotion_result.timestamp,
+                "timestamp": emotion_result.timestamp.isoformat() if emotion_result.timestamp else None,
                 "features": emotion_result.features
             }))
             
@@ -165,13 +185,14 @@ async def websocket_emotion_stream(websocket: WebSocket):
         await websocket.close(code=1000)
 
 @app.post("/detect-emotion/stream", response_model=EmotionResult)
-async def detect_emotion_stream(audio_data: bytes):
+async def detect_emotion_stream(request: Request):
     """
     Process audio stream for real-time emotion detection
     """
     try:
+        audio_data = await request.body()
         # Process audio chunk
-        emotion_result = await streaming_processor.process_audio_chunk(audio_data)
+        emotion_result = await _maybe_await(streaming_processor.process_audio_chunk(audio_data))
         
         return emotion_result
         
