@@ -48,6 +48,7 @@ This directory contains comprehensive test suites for the ResonaAI Voice-First M
 |------------------|-----------|--------|
 | **Auth Flow** | `integration/test_auth_flow.py` | ✅ Complete |
 | **Crisis Detection** | `integration/test_crisis_detection.py` | ✅ Complete |
+| **Frontend-Backend Integration** | `integration/test_frontend_backend_integration.py` | ✅ Complete |
 | **Speech Processing** | `integration/test_speech_processing.py` | ✅ Complete |
 
 ## Test Structure

@@ -232,7 +232,7 @@ def main():
     CLI entry point for running the nightly scheduler
 
     Usage:
-        python -m overnight_builder.nightly_scheduler [--once] [--timezone TIMEZONE] [--dry-run]
+        python -m src.overnight_builder.nightly_scheduler [--once] [--timezone TIMEZONE] [--dry-run]
     """
 
     import argparse

@@ -2,17 +2,30 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { MessageSquare, Heart, TrendingUp, Shield, Globe } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { CulturalGreeting } from '../components/design-system';
 import './HomePage.css';
 
 const HomePage: React.FC = () => {
   const { user } = useAuth();
+  
+  // Determine time of day
+  const getTimeOfDay = (): 'morning' | 'afternoon' | 'evening' | 'night' => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) return 'morning';
+    if (hour >= 12 && hour < 17) return 'afternoon';
+    if (hour >= 17 && hour < 22) return 'evening';
+    return 'night';
+  };
 
   return (
     <div className="home-page">
       <div className="home-hero">
-        <h1 className="home-title">
-          Welcome{user?.email ? `, ${user.email.split('@')[0]}` : ''}
-        </h1>
+        <CulturalGreeting
+          language="english"
+          timeOfDay={getTimeOfDay()}
+          mood="warm"
+          userName={user?.email?.split('@')[0]}
+        />
         <p className="home-subtitle">
           Your voice-first mental health companion for East Africa
         </p>

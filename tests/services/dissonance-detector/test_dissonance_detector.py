@@ -20,7 +20,7 @@ class TestDissonanceDetector:
     def client(self):
         """Create test client with mocked dependencies"""
         # Change to service directory for imports
-        service_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'services', 'dissonance-detector'))
+        service_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'apps', 'backend', 'services', 'dissonance-detector'))
         old_cwd = os.getcwd()
         os.chdir(service_dir)
         

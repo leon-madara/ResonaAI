@@ -14,6 +14,7 @@ from typing import List, Dict, Any
 import numpy as np
 from loguru import logger
 import inspect
+import os
 
 from src.audio_processor import AudioProcessor
 from src.emotion_detector import EmotionDetector
@@ -23,7 +24,13 @@ from src.config import settings
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
-logger.add("logs/app.log", rotation="1 day", retention="7 days")
+try:
+    log_path = os.path.join(os.path.dirname(__file__), "logs", "app.log")
+    os.makedirs(os.path.dirname(log_path), exist_ok=True)
+    logger.add(log_path, rotation="1 day", retention="7 days")
+except Exception as e:
+    # Don't fail test/runtime startup due to filesystem permissions.
+    logger.warning(f"File logging disabled: {e}")
 
 app = FastAPI(
     title="ResonaAI - Voice Emotion Detection",

@@ -262,14 +262,297 @@
   color: #6ee7b7;
 }
 
+.loading-state,
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem;
+  color: #6b7280;
+}
+
+.dark .loading-state,
+.dark .empty-state {
+  color: #9ca3af;
+}
+
+.loading-state {
+  flex-direction: row;
+}
+
+.empty-state svg {
+  color: #9ca3af;
+}
+
+.sessions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.session-item {
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  background: #f9fafb;
+  transition: all 0.2s;
+}
+
+.dark .session-item {
+  background: #111827;
+  border-color: #374151;
+}
+
+.session-item:hover {
+  border-color: #667eea;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.session-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.session-date {
+  font-weight: 600;
+  color: #111827;
+}
+
+.dark .session-date {
+  color: #f9fafb;
+}
+
+.crisis-badge {
+  padding: 0.25rem 0.75rem;
+  background: #fee2e2;
+  color: #991b1b;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.dark .crisis-badge {
+  background: #7f1d1d;
+  color: #fca5a5;
+}
+
+.session-details {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+}
+
+.dark .session-details {
+  color: #9ca3af;
+}
+
+.session-time,
+.session-messages {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.session-emotion {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-top: 0.5rem;
+}
+
+.dark .session-emotion {
+  color: #9ca3af;
+}
+
+.more-sessions {
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+.dark .more-sessions {
+  color: #9ca3af;
+}
+
+.baseline-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.baseline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.baseline-metrics {
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.dark .baseline-metrics {
+  border-top-color: #374151;
+}
+
+.metrics-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #111827;
+}
+
+.dark .metrics-title {
+  color: #f9fafb;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.metric-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.metric-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.dark .metric-label {
+  color: #9ca3af;
+}
+
+.metric-value {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.dark .metric-value {
+  color: #f9fafb;
+}
+
+.baseline-updated {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.dark .baseline-updated {
+  color: #9ca3af;
+}
+
+.deviation-history {
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.dark .deviation-history {
+  border-top-color: #374151;
+}
+
+.deviations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.deviation-item {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.75rem;
+  background: #f3f4f6;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.dark .deviation-item {
+  background: #111827;
+}
+
+.deviation-date {
+  color: #6b7280;
+  min-width: 100px;
+}
+
+.dark .deviation-date {
+  color: #9ca3af;
+}
+
+.deviation-score {
+  font-weight: 600;
+  color: #667eea;
+}
+
+.deviation-emotion {
+  margin-left: auto;
+  padding: 0.25rem 0.75rem;
+  background: #dbeafe;
+  color: #1e40af;
+  border-radius: 9999px;
+  font-weight: 500;
+}
+
+.dark .deviation-emotion {
+  background: #1e3a8a;
+  color: #93c5fd;
+}
+
+.status-badge.active {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.dark .status-badge.active {
+  background: #064e3b;
+  color: #6ee7b7;
+}
+
+.data-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 @media (max-width: 768px) {
   .info-grid {
     grid-template-columns: 1fr;
   }
 
-  .baseline-info {
+  .baseline-header {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .deviation-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .deviation-emotion {
+    margin-left: 0;
   }
 }
 

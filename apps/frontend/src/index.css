@@ -19,6 +19,18 @@
   --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   --primary-color: #667eea;
   --secondary-color: #764ba2;
+  
+  /* Animation durations */
+  --transition-fast: 150ms;
+  --transition-base: 200ms;
+  --transition-slow: 300ms;
+  --transition-slower: 500ms;
+  
+  /* Easing functions */
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
 /* Dark Mode Variables */
@@ -27,6 +39,37 @@
   --text-color: #f9fafb;
   --border-color: #374151;
   --card-bg: #1f2937;
+}
+
+/* Adaptive Theme Variables */
+.theme-stable {
+  --accent-color: #10b981;
+  --accent-light: #d1fae5;
+  --accent-dark: #065f46;
+}
+
+.theme-anxiety {
+  --accent-color: #f59e0b;
+  --accent-light: #fef3c7;
+  --accent-dark: #92400e;
+}
+
+.theme-depression {
+  --accent-color: #6366f1;
+  --accent-light: #e0e7ff;
+  --accent-dark: #3730a3;
+}
+
+.theme-crisis {
+  --accent-color: #ef4444;
+  --accent-light: #fee2e2;
+  --accent-dark: #991b1b;
+}
+
+.theme-neutral {
+  --accent-color: #667eea;
+  --accent-light: #e0e7ff;
+  --accent-dark: #4338ca;
 }
 
 /* Base Styles */
@@ -43,7 +86,9 @@ body {
     sans-serif;
   background-color: var(--bg-color);
   color: var(--text-color);
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color var(--transition-slow) var(--ease-in-out), 
+              color var(--transition-slow) var(--ease-in-out);
+  overflow-x: hidden;
 }
 
 #root {
@@ -66,11 +111,18 @@ p {
 a {
   color: var(--primary-color);
   text-decoration: none;
-  transition: color 0.2s ease;
+  transition: color var(--transition-base) var(--ease-in-out),
+              transform var(--transition-base) var(--ease-out);
+  position: relative;
 }
 
 a:hover {
   color: var(--secondary-color);
+  transform: translateY(-1px);
+}
+
+a:active {
+  transform: translateY(0);
 }
 
 /* Buttons */
@@ -79,11 +131,42 @@ button {
   cursor: pointer;
   border: none;
   outline: none;
+  transition: all var(--transition-base) var(--ease-out);
+  position: relative;
+  overflow: hidden;
+}
+
+button:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+
+button:not(:disabled):active {
+  transform: translateY(0);
 }
 
 button:disabled {
   cursor: not-allowed;
   opacity: 0.6;
+  transform: none !important;
+}
+
+/* Button ripple effect */
+button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+button:active::before {
+  width: 300px;
+  height: 300px;
 }
 
 /* Form Elements */
@@ -152,6 +235,127 @@ input, textarea, select {
   }
 }
 
+/* Global Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+/* Utility Animation Classes */
+.animate-fade-in {
+  animation: fadeIn var(--transition-slow) var(--ease-out);
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp var(--transition-slow) var(--ease-out);
+}
+
+.animate-fade-in-down {
+  animation: fadeInDown var(--transition-slow) var(--ease-out);
+}
+
+.animate-slide-in-right {
+  animation: slideInRight var(--transition-slow) var(--ease-out);
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft var(--transition-slow) var(--ease-out);
+}
+
+.animate-scale-in {
+  animation: scaleIn var(--transition-base) var(--ease-bounce);
+}
+
+/* Smooth transitions for theme changes */
+* {
+  transition: background-color var(--transition-slow) var(--ease-in-out),
+              color var(--transition-slow) var(--ease-in-out),
+              border-color var(--transition-slow) var(--ease-in-out);
+}
+
+/* Skip transitions for theme changes on initial load */
+.no-transition,
+.no-transition * {
+  transition: none !important;
+}
+
 /* Print Styles */
 @media print {
   * {
@@ -159,6 +363,17 @@ input, textarea, select {
     color: black !important;
     box-shadow: none !important;
     text-shadow: none !important;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 

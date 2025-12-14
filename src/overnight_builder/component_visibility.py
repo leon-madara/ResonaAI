@@ -7,13 +7,7 @@ Implements progressive disclosure - only show what's relevant now.
 
 from typing import Dict, List, Optional, Callable
 from dataclasses import dataclass
-import sys
-import os
-
-# Add parent directory to path for imports
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from pattern_analysis.pattern_aggregator import AggregatedPatterns
+from src.pattern_analysis.pattern_aggregator import AggregatedPatterns
 
 
 @dataclass

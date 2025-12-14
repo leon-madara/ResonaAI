@@ -4,6 +4,8 @@
   height: calc(100vh - 4rem);
   display: flex;
   flex-direction: column;
+  animation: fadeIn var(--transition-slow) var(--ease-out);
+  padding: 1rem;
 }
 
 .chat-header {
@@ -121,11 +123,20 @@
   background: white;
   border-radius: 0.75rem;
   border: 1px solid #e5e7eb;
+  transition: all var(--transition-base) var(--ease-out);
+  animation: fadeInUp var(--transition-slow) var(--ease-out);
+  animation-delay: 0.2s;
+  animation-fill-mode: both;
 }
 
 .dark .recorder-section {
   background: #1f2937;
   border-color: #374151;
+}
+
+.recorder-section:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+              0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 @media (max-width: 768px) {

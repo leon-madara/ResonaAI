@@ -11,7 +11,7 @@ import io
 import logging
 from loguru import logger
 
-from src.config import settings
+from .config import settings
 
 class AudioProcessor:
     """Audio preprocessing and feature extraction"""

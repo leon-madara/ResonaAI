@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from contextlib import asynccontextmanager
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Any, Optional
 from pydantic import BaseModel
 import os
@@ -17,6 +17,9 @@ import uuid
 
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
+from workers.sync_tasks import process_sync_operation
+from services.validator import get_data_validator
+from services.conflict_resolver import get_conflict_resolver
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -61,11 +64,12 @@ def _enqueue_sync_operation(user_id: str, operation_type: str, payload: Dict[str
 
     db = SessionLocal()
     try:
+        # Use database-agnostic SQL (works with both PostgreSQL and SQLite)
         db.execute(
             text(
                 """
                 INSERT INTO sync_queue (id, user_id, operation_type, encrypted_data, status, created_at, retry_count)
-                VALUES (:id::uuid, :user_id::uuid, :operation_type, :encrypted_data, 'pending', NOW(), 0)
+                VALUES (:id, :user_id, :operation_type, :encrypted_data, 'pending', CURRENT_TIMESTAMP, 0)
                 """
             ),
             {
@@ -116,26 +120,93 @@ async def upload_data(
 ):
     """Upload offline data for synchronization"""
     try:
+        # Validate data
+        validator = get_data_validator()
+        is_valid, error, warnings = validator.validate(
+            user_id=request.user_id,
+            operation_type=request.operation_type,
+            data=request.data
+        )
+        
+        if not is_valid:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=error or "Validation failed"
+            )
+        
+        if warnings:
+            logger.warning(f"Validation warnings for sync {request.user_id}: {warnings}")
+        
+        # Enqueue operation
         sync_id = _enqueue_sync_operation(
             user_id=request.user_id,
             operation_type=request.operation_type,
             payload=request.data,
         )
-
+        
+        # Trigger background processing
+        try:
+            process_sync_operation.delay(
+                sync_id=sync_id,
+                user_id=request.user_id,
+                operation_type=request.operation_type,
+                payload=request.data
+            )
+            logger.info(f"Sync operation {sync_id} queued for background processing")
+        except Exception as e:
+            logger.warning(f"Failed to queue Celery task (will process on next poll): {e}")
+            # Operation is still queued in database, will be picked up by worker
+        
         return SyncResponse(
             sync_id=sync_id,
             status="queued",
             message="Data queued for synchronization",
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             stored=True,
             encrypted=False,
         )
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Failed to enqueue sync operation: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to queue sync operation",
         )
+
+
+@app.get("/sync/status/{sync_id}")
+async def get_sync_status(
+    sync_id: str,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Get sync operation status"""
+    db = SessionLocal()
+    try:
+        row = db.execute(
+            text("""
+                SELECT id, status, created_at, processed_at, retry_count
+                FROM sync_queue
+                WHERE id = :id
+            """),
+            {"id": sync_id}
+        ).fetchone()
+        
+        if not row:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Sync operation not found"
+            )
+        
+        return {
+            "sync_id": str(row.id),
+            "status": row.status,
+            "created_at": row.created_at.isoformat() if row.created_at else None,
+            "processed_at": row.processed_at.isoformat() if row.processed_at else None,
+            "retry_count": row.retry_count,
+        }
+    finally:
+        db.close()
 
 if __name__ == "__main__":
     import uvicorn

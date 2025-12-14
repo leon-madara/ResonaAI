@@ -9,7 +9,7 @@ from unittest.mock import Mock, AsyncMock, patch
 from fastapi.testclient import TestClient
 
 # Add services to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', '..', 'services', 'api-gateway'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', '..', 'apps', 'backend', 'gateway'))
 
 
 class TestServiceRouting:
@@ -18,13 +18,34 @@ class TestServiceRouting:
     @pytest.fixture
     def client(self):
         """Create test client with mocked dependencies"""
-        with patch('main.redis_client') as mock_redis, \
-             patch('main.health_checker') as mock_health, \
-             patch('main.http_client') as mock_http:
-            
+        for mod_name in list(sys.modules.keys()):
+            if mod_name in ["main", "config"] or mod_name.startswith("middleware."):
+                del sys.modules[mod_name]
+
+        with patch.dict(os.environ, {
+            "JWT_SECRET_KEY": "test-secret",
+            "JWT_ALGORITHM": "HS256",
+            "JWT_EXPIRATION_HOURS": "24",
+            "REDIS_HOST": "localhost",
+            "REDIS_PORT": "6379",
+        }), patch("redis.Redis") as mock_redis_cls, patch("httpx.AsyncClient") as mock_httpx_cls:
+
+            mock_redis = Mock()
+            mock_pipe = Mock()
+            mock_pipe.zremrangebyscore.return_value = None
+            mock_pipe.zcard.return_value = None
+            mock_pipe.zadd.return_value = None
+            mock_pipe.expire.return_value = None
+            mock_pipe.execute.return_value = [None, 0, None, None]
+            mock_redis.pipeline.return_value = mock_pipe
+            mock_redis.zcount.return_value = 0
             mock_redis.ping.return_value = True
-            mock_health.check_all_services = Mock(return_value={})
-            
+            mock_redis_cls.return_value = mock_redis
+
+            mock_http = AsyncMock()
+            mock_http.aclose = AsyncMock()
+            mock_httpx_cls.return_value = mock_http
+
             from main import app
             return TestClient(app)
     
@@ -113,5 +134,5 @@ class TestServiceRouting:
     def test_protected_endpoint_requires_auth(self, client):
         """Test that protected endpoints require authentication"""
         response = client.post("/speech/transcribe", json={})
-        assert response.status_code == 403  # Forbidden without token
+        assert response.status_code == 401  # Unauthorized without token
 

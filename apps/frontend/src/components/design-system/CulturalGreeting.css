@@ -1,0 +1,59 @@
+.cultural-greeting {
+  padding: 1.5rem;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.cultural-greeting--warm {
+  background: linear-gradient(135deg, #fff5e6 0%, #ffe8cc 100%);
+  color: #8b4513;
+}
+
+.cultural-greeting--gentle {
+  background: linear-gradient(135deg, #e6f3ff 0%, #cce7ff 100%);
+  color: #1e3a5f;
+}
+
+.cultural-greeting--concerned {
+  background: linear-gradient(135deg, #fff0e6 0%, #ffe0cc 100%);
+  color: #8b4513;
+}
+
+.cultural-greeting--celebratory {
+  background: linear-gradient(135deg, #e6ffe6 0%, #ccffcc 100%);
+  color: #1e5f1e;
+}
+
+.cultural-greeting__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cultural-greeting__greeting {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.cultural-greeting__personalization {
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0;
+  opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+  .cultural-greeting {
+    padding: 1rem;
+  }
+
+  .cultural-greeting__greeting {
+    font-size: 1.25rem;
+  }
+
+  .cultural-greeting__personalization {
+    font-size: 0.9rem;
+  }
+}
+

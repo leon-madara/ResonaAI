@@ -15,14 +15,19 @@ Log of completed features and milestones.
 | Security & Privacy | `05-Security-Privacy.md` | Encryption, consent, auth |
 | Testing | `06-Testing.md` | Test infrastructure, coverage |
 | Documentation | `07-Documentation.md` | System docs, API docs, guides |
+| Micro-Moment Detector | `08-Micro-Moment-Detector.md` | Physiological stress signal detection |
 
 ## 📊 Summary
 
-- **7 major areas** completed
+- **8 major areas** completed
 - **Phase 1 Foundation** complete
 - **9 microservices** fully implemented with tests
 - **Frontend foundation** established
 - **Security baseline** implemented
+- **Dissonance Detector** production-ready (December 12, 2025)
+  - See: `../progress/reports/25-12-12-Dissonance-Detector-Implementation-Completion.md`
+- **Micro-Moment Detector** production-ready (December 12, 2025)
+  - See: `08-Micro-Moment-Detector.md`
 
 ## 📁 Files in This Directory
 
@@ -35,6 +40,7 @@ Log of completed features and milestones.
 | `05-Security-Privacy.md` | - | Encryption service, consent management |
 | `06-Testing.md` | - | 63+ test cases, pytest infrastructure |
 | `07-Documentation.md` | - | Architecture docs, API reference |
+| `08-Micro-Moment-Detector.md` | - | Tremor, sigh, voice crack, hesitation detection |
 
 ## 🔄 Migration Notes
 

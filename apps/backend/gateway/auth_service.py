@@ -2,26 +2,73 @@
 Authentication service for user management
 """
 
-from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
 from database import User
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 import re
+import base64
+import hashlib
+import hmac
+import os
 
-# Password hashing context
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+try:
+    import bcrypt  # type: ignore
+except Exception:  # pragma: no cover
+    bcrypt = None
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Verify a password against its hash"""
-    return pwd_context.verify(plain_password, hashed_password)
+    """Verify a password against its hash.
+
+    Uses bcrypt when available; falls back to PBKDF2-HMAC-SHA256 when bcrypt is
+    not installed (primarily for local test environments).
+    """
+    try:
+        if bcrypt is not None and hashed_password.startswith("$2"):
+            return bcrypt.checkpw(
+                plain_password.encode("utf-8"),
+                hashed_password.encode("utf-8"),
+            )
+
+        # PBKDF2 fallback format: pbkdf2_sha256$<iters>$<salt_b64>$<hash_b64>
+        if hashed_password.startswith("pbkdf2_sha256$"):
+            parts = hashed_password.split("$")
+            if len(parts) != 4:
+                return False
+            _, iters_s, salt_b64, hash_b64 = parts
+            iters = int(iters_s)
+            salt = base64.b64decode(salt_b64.encode("utf-8"))
+            expected = base64.b64decode(hash_b64.encode("utf-8"))
+            derived = hashlib.pbkdf2_hmac("sha256", plain_password.encode("utf-8"), salt, iters, dklen=len(expected))
+            return hmac.compare_digest(derived, expected)
+
+        # Unknown format
+        return False
+    except (ValueError, TypeError):
+        return False
 
 
 def get_password_hash(password: str) -> str:
-    """Hash a password"""
-    return pwd_context.hash(password)
+    """Hash a password.
+
+    Uses bcrypt when available; otherwise uses PBKDF2-HMAC-SHA256.
+    """
+    if bcrypt is not None:
+        salt = bcrypt.gensalt()
+        hashed = bcrypt.hashpw(password.encode("utf-8"), salt)
+        return hashed.decode("utf-8")
+
+    # PBKDF2 fallback
+    iters = 200_000
+    salt = os.urandom(16)
+    derived = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, iters, dklen=32)
+    return "pbkdf2_sha256$%d$%s$%s" % (
+        iters,
+        base64.b64encode(salt).decode("utf-8"),
+        base64.b64encode(derived).decode("utf-8"),
+    )
 
 
 def validate_email(email: str) -> bool:
@@ -92,8 +139,8 @@ def create_user(
         password_hash=password_hash,
         consent_version=consent_version,
         is_anonymous=is_anonymous,
-        created_at=datetime.utcnow(),
-        last_active=datetime.utcnow()
+        created_at=datetime.now(timezone.utc),
+        last_active=datetime.now(timezone.utc)
     )
     
     db.add(user)
@@ -118,7 +165,7 @@ def authenticate_user(db: Session, email: str, password: str) -> Optional[User]:
         return None
     
     # Update last active
-    user.last_active = datetime.utcnow()
+    user.last_active = datetime.now(timezone.utc)
     db.commit()
     
     return user

@@ -81,8 +81,8 @@ const ConversationUI: React.FC<ConversationUIProps> = ({ className = '' }) => {
     setIsProcessing(true);
 
     try {
-      // Add user message
-      const userMessage: Message = {
+      // Add user message (addMessage will assign the id)
+      addMessage({
         type: 'user',
         content: content || '[Voice message]',
         timestamp: new Date(),
@@ -91,9 +91,7 @@ const ConversationUI: React.FC<ConversationUIProps> = ({ className = '' }) => {
           emotion: currentEmotion.emotion,
           confidence: currentEmotion.confidence
         } : undefined
-      };
-      
-      addMessage(userMessage);
+      });
       setInputText('');
       setIsTyping(true);
 
@@ -122,17 +120,15 @@ const ConversationUI: React.FC<ConversationUIProps> = ({ className = '' }) => {
       
       setIsTyping(false);
 
-      // Add AI response
-      const aiMessage: Message = {
+      // Add AI response (addMessage will assign the id)
+      addMessage({
         type: 'ai',
         content: result.message,
         timestamp: new Date(),
         emotion: result.emotion_detected
           ? { emotion: result.emotion_detected, confidence: 1.0 }
           : undefined,
-      };
-      
-      addMessage(aiMessage);
+      });
 
       // Auto-play AI response if TTS is enabled (only for non-crisis responses)
       if (result.response_type !== 'crisis_intervention' && !isSpeaking) {

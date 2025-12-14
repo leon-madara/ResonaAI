@@ -32,7 +32,18 @@ class TestEncryptionService:
         key_file = os.path.join(temp_dir, "master.key")
         
         # Get service directory
-        service_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'services', 'encryption-service'))
+        service_dir = os.path.abspath(
+            os.path.join(
+                os.path.dirname(__file__),
+                "..",
+                "..",
+                "..",
+                "apps",
+                "backend",
+                "services",
+                "encryption-service",
+            )
+        )
         
         # Save current directory and change to service directory
         old_cwd = os.getcwd()
@@ -312,4 +323,203 @@ class TestEncryptionService:
         assert len(data["results"]) == 2
         assert data["results"][0]["message"] == original_messages[0]
         assert data["results"][1]["message"] == original_messages[1]
+    
+    def test_batch_encrypt_with_conversation_id(self, client):
+        """Test batch encryption with conversation ID"""
+        request_data = {
+            "messages": ["Message 1", "Message 2"],
+            "user_id": "test-user",
+            "password": "user-password",
+            "conversation_id": "conv-123"
+        }
+        
+        response = client.post(
+            "/e2e/batch-encrypt",
+            json=request_data
+        )
+        
+        assert response.status_code == 200
+        data = response.json()
+        assert data["success"] is True
+        assert data["count"] == 2
+        assert len(data["results"]) == 2
+    
+    def test_batch_encrypt_empty_list(self, client):
+        """Test batch encryption with empty message list"""
+        request_data = {
+            "messages": [],
+            "user_id": "test-user",
+            "password": "user-password"
+        }
+        
+        response = client.post(
+            "/e2e/batch-encrypt",
+            json=request_data
+        )
+        
+        assert response.status_code == 200
+        data = response.json()
+        assert data["success"] is True
+        assert data["count"] == 0
+        assert len(data["results"]) == 0
+    
+    def test_batch_decrypt_empty_list(self, client):
+        """Test batch decryption with empty encrypted contents list"""
+        request_data = {
+            "encrypted_contents": [],
+            "user_id": "test-user",
+            "password": "user-password"
+        }
+        
+        response = client.post(
+            "/e2e/batch-decrypt",
+            json=request_data
+        )
+        
+        assert response.status_code == 200
+        data = response.json()
+        assert data["success"] is True
+        assert data["count"] == 0
+        assert len(data["results"]) == 0
+    
+    def test_batch_decrypt_wrong_password(self, client):
+        """Test batch decryption with wrong password"""
+        original_messages = ["Message 1", "Message 2"]
+        user_id = "test-user"
+        correct_password = "correct-password"
+        wrong_password = "wrong-password"
+        
+        # Encrypt messages with correct password
+        encrypted_contents = []
+        for msg in original_messages:
+            encrypt_response = client.post(
+                f"/e2e/encrypt-message?message={msg}&user_id={user_id}&password={correct_password}"
+            )
+            encrypted_contents.append(encrypt_response.json()["result"]["encrypted_content"])
+        
+        # Try to decrypt with wrong password
+        request_data = {
+            "encrypted_contents": encrypted_contents,
+            "user_id": user_id,
+            "password": wrong_password
+        }
+        
+        response = client.post(
+            "/e2e/batch-decrypt",
+            json=request_data
+        )
+        
+        # Should fail
+        assert response.status_code == 500
+    
+    def test_batch_decrypt_invalid_content(self, client):
+        """Test batch decryption with invalid encrypted content"""
+        request_data = {
+            "encrypted_contents": ["invalid-encrypted-data!!!", "another-invalid-data"],
+            "user_id": "test-user",
+            "password": "user-password"
+        }
+        
+        response = client.post(
+            "/e2e/batch-decrypt",
+            json=request_data
+        )
+        
+        # Should fail
+        assert response.status_code == 500
+    
+    def test_batch_encrypt_decrypt_roundtrip(self, client):
+        """Test batch encrypt and decrypt roundtrip"""
+        original_messages = ["Message 1", "Message 2", "Message 3"]
+        user_id = "test-user"
+        password = "user-password"
+        
+        # Encrypt in batch
+        encrypt_request = {
+            "messages": original_messages,
+            "user_id": user_id,
+            "password": password
+        }
+        encrypt_response = client.post(
+            "/e2e/batch-encrypt",
+            json=encrypt_request
+        )
+        assert encrypt_response.status_code == 200
+        encrypt_data = encrypt_response.json()
+        assert encrypt_data["success"] is True
+        assert encrypt_data["count"] == 3
+        
+        # Extract encrypted contents
+        encrypted_contents = [result["encrypted_content"] for result in encrypt_data["results"]]
+        
+        # Decrypt in batch
+        decrypt_request = {
+            "encrypted_contents": encrypted_contents,
+            "user_id": user_id,
+            "password": password
+        }
+        decrypt_response = client.post(
+            "/e2e/batch-decrypt",
+            json=decrypt_request
+        )
+        assert decrypt_response.status_code == 200
+        decrypt_data = decrypt_response.json()
+        assert decrypt_data["success"] is True
+        assert decrypt_data["count"] == 3
+        
+        # Verify all messages match
+        for i, result in enumerate(decrypt_data["results"]):
+            assert result["message"] == original_messages[i]
+    
+    def test_batch_encrypt_single_message(self, client):
+        """Test batch encryption with single message"""
+        request_data = {
+            "messages": ["Single message"],
+            "user_id": "test-user",
+            "password": "user-password"
+        }
+        
+        response = client.post(
+            "/e2e/batch-encrypt",
+            json=request_data
+        )
+        
+        assert response.status_code == 200
+        data = response.json()
+        assert data["success"] is True
+        assert data["count"] == 1
+        assert len(data["results"]) == 1
+        assert "encrypted_content" in data["results"][0]
+    
+    def test_batch_encrypt_missing_fields(self, client):
+        """Test batch encryption with missing required fields"""
+        # Missing password
+        request_data = {
+            "messages": ["Message 1"],
+            "user_id": "test-user"
+        }
+        
+        response = client.post(
+            "/e2e/batch-encrypt",
+            json=request_data
+        )
+        
+        # Should return validation error
+        assert response.status_code == 422
+    
+    def test_batch_decrypt_missing_fields(self, client):
+        """Test batch decryption with missing required fields"""
+        # Missing password
+        request_data = {
+            "encrypted_contents": ["encrypted-data"],
+            "user_id": "test-user"
+        }
+        
+        response = client.post(
+            "/e2e/batch-decrypt",
+            json=request_data
+        )
+        
+        # Should return validation error
+        assert response.status_code == 422
 

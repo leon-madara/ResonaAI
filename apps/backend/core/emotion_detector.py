@@ -15,8 +15,8 @@ import logging
 from loguru import logger
 from datetime import datetime
 
-from src.config import settings
-from src.models import EmotionResult, AudioFeatures, EmotionPrediction
+from .config import settings
+from .models import EmotionResult, AudioFeatures, EmotionPrediction
 
 class EmotionDetector:
     """Emotion detection using multiple approaches"""

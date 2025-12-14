@@ -94,6 +94,16 @@ CREATE INDEX idx_sync_queue_status ON sync_queue(status);
 CREATE INDEX idx_sync_queue_created_at ON sync_queue(created_at);
 CREATE INDEX idx_sync_queue_pending ON sync_queue(status, created_at) WHERE status = 'pending';
 
+-- User preferences (offline-first UI/UX settings; stored as JSON for MVP)
+CREATE TABLE user_preferences (
+    user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    preferences JSONB NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_user_preferences_updated_at ON user_preferences(updated_at);
+
 -- ============================================
 -- 4. Crisis Management
 -- ============================================

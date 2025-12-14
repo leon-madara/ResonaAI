@@ -70,7 +70,7 @@ services:
   # Dissonance Detector Service
   dissonance-detector:
     build:
-      context: ./services/dissonance-detector
+      context: ../../apps/backend/services/dissonance-detector
       dockerfile: Dockerfile
     ports:
       - "8008:8000"
@@ -86,6 +86,12 @@ services:
       - ./models:/app/models
     networks:
       - mental-health-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 3
 
   # Baseline Tracker Service
   baseline-tracker:
@@ -189,7 +195,7 @@ services:
   # Cultural Context Service
   cultural-context:
     build:
-      context: ./services/cultural-context
+      context: ../../apps/backend/services/cultural-context
       dockerfile: Dockerfile
     ports:
       - "8007:8000"

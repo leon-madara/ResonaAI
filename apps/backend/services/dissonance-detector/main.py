@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from contextlib import asynccontextmanager
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 
 from config import settings
 from models.dissonance_models import DissonanceRequest, DissonanceResponse, SentimentResult, DissonanceDetails
@@ -16,7 +16,10 @@ from services.sentiment_analyzer import SentimentAnalyzer
 from services.dissonance_calculator import DissonanceCalculator
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
 
 # Security
@@ -52,10 +55,18 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# CORS middleware
+# CORS middleware - Configure appropriately for production
+debug_mode = getattr(settings, 'DEBUG', False)
+cors_origins = ["*"] if debug_mode else [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "https://mentalhealth.ke",
+    "https://www.mentalhealth.ke"
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure appropriately for production
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -65,11 +76,25 @@ app.add_middleware(
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
-    return {
-        "status": "healthy",
-        "service": "dissonance-detector",
-        "model_loaded": sentiment_analyzer._model_loaded
-    }
+    try:
+        model_status = "loaded" if sentiment_analyzer._model_loaded else "not_loaded"
+        status = "healthy" if sentiment_analyzer._model_loaded else "degraded"
+        
+        return {
+            "status": status,
+            "service": "dissonance-detector",
+            "model_loaded": sentiment_analyzer._model_loaded,
+            "model_status": model_status,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+    except Exception as e:
+        logger.error(f"Health check failed: {str(e)}")
+        return {
+            "status": "unhealthy",
+            "service": "dissonance-detector",
+            "error": str(e),
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
 
 
 @app.post("/analyze", response_model=DissonanceResponse)
@@ -110,16 +135,41 @@ async def analyze_dissonance(
     }
     """
     try:
-        logger.info(f"Analyzing dissonance for transcript: {request.transcript[:50]}...")
+        # Validate input
+        if not request.transcript or not request.transcript.strip():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Transcript is required and cannot be empty"
+            )
+        
+        if not request.voice_emotion:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="voice_emotion is required"
+            )
+        
+        if "emotion" not in request.voice_emotion:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="voice_emotion must contain 'emotion' field"
+            )
+        
+        logger.info(
+            f"Analyzing dissonance for user {request.user_id or 'unknown'}, "
+            f"session {request.session_id or 'unknown'}, "
+            f"transcript: {request.transcript[:50]}..."
+        )
         
         # Analyze sentiment from transcript
         sentiment_result = await sentiment_analyzer.analyze(request.transcript)
+        logger.debug(f"Sentiment analysis result: {sentiment_result}")
         
         # Calculate dissonance
         dissonance_result = dissonance_calculator.calculate(
             sentiment_result,
             request.voice_emotion
         )
+        logger.debug(f"Dissonance calculation result: {dissonance_result}")
         
         # Build response
         response = DissonanceResponse(
@@ -135,17 +185,26 @@ async def analyze_dissonance(
         )
         
         logger.info(
-            f"Dissonance analysis complete: {response.dissonance_level} "
-            f"(score: {response.dissonance_score:.2f})"
+            f"Dissonance analysis complete for user {request.user_id or 'unknown'}: "
+            f"{response.dissonance_level} (score: {response.dissonance_score:.2f}, "
+            f"risk: {response.risk_level})"
         )
         
         return response
         
+    except HTTPException:
+        raise
+    except ValueError as e:
+        logger.error(f"Validation error analyzing dissonance: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid input: {str(e)}"
+        )
     except Exception as e:
-        logger.error(f"Error analyzing dissonance: {str(e)}")
+        logger.error(f"Error analyzing dissonance: {str(e)}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Dissonance analysis failed: {str(e)}"
+            detail="Dissonance analysis failed. Please try again later."
         )
 
 

@@ -114,7 +114,7 @@ Before marking a service as "Complete":
 - **Full Status Mapping**: `architecture/PROJECT_RULES_AND_STATUS.md`
 - **Completed Work**: `Completed/07-Documentation.md`
 - **In Progress**: `In Progress/README.md`
-- **To Do**: `To Do/README.md`
+- **To Do**: `project/backlog/README.md`
 
 ---
 

@@ -13,7 +13,7 @@ import redis
 import jwt
 import logging
 from typing import Dict, Any
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from contextlib import asynccontextmanager
 from sqlalchemy.orm import Session
 import os
@@ -28,7 +28,7 @@ from middleware.refresh_token import RefreshTokenService, create_refresh_token_s
 from middleware.api_key_auth import APIKeyService, get_api_key_service, require_api_key
 from utils.health_check import HealthChecker
 from database import get_db, User, Role, AuditLog, RefreshToken, APIKey
-from auth_service import authenticate_user, create_user, get_user_by_id, verify_password
+from auth_service import authenticate_user, create_user, get_user_by_id, get_user_by_email, verify_password, validate_email, validate_password
 import uuid as uuid_module
 
 # Initialize refresh token service
@@ -217,7 +217,7 @@ async def login(request: Request, db: Session = Depends(get_db)):
                 "user_id": str(user.id),
                 "email": user.email,
                 "role": user_role,
-                "exp": datetime.utcnow() + timedelta(hours=settings.JWT_EXPIRATION_HOURS)
+                "exp": datetime.now(timezone.utc) + timedelta(hours=settings.JWT_EXPIRATION_HOURS)
             }
             
             token = jwt.encode(
@@ -266,6 +266,68 @@ async def login(request: Request, db: Session = Depends(get_db)):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Login failed"
+        )
+
+
+@app.get("/auth/verify-email")
+async def verify_email(
+    token: str,
+    email: str,
+    db: Session = Depends(get_db)
+):
+    """Verify user email address"""
+    try:
+        from services.email_service import get_email_service
+
+        if not token or not email:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Token and email required"
+            )
+        
+        # Get user
+        user = get_user_by_email(db, email)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+        
+        # Verify token
+        email_service = get_email_service()
+        is_valid = email_service.verify_token(
+            token=token,
+            email=email,
+            secret_key=settings.JWT_SECRET_KEY,
+            max_age_hours=24
+        )
+        
+        if not is_valid:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid or expired verification token"
+            )
+        
+        # Mark email as verified (if field exists)
+        # Note: Add email_verified field to User model if not present
+        if hasattr(user, 'email_verified'):
+            user.email_verified = True
+            db.commit()
+        
+        logger.info(f"Email verified for user: {user.email}")
+        
+        return {
+            "message": "Email verified successfully",
+            "email": email
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Email verification failed: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Email verification failed"
         )
 
 
@@ -1596,6 +1658,121 @@ async def upload_data(request: Request, credentials: HTTPAuthorizationCredential
 async def get_cultural_context(request: Request, credentials: HTTPAuthorizationCredentials = Depends(security)):
     """Route to cultural context service"""
     return await route_to_service("cultural_context", "/context", request, credentials)
+
+# ============================================================================
+# INTERFACE CONFIG ENDPOINTS
+# ============================================================================
+
+@app.get("/users/{user_id}/interface/current")
+async def get_user_interface_config(
+    user_id: str,
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    db: Session = Depends(get_db)
+):
+    """
+    Get current encrypted UIConfig for a user
+    
+    Returns encrypted config that client will decrypt using user's key
+    The salt is embedded in the encrypted data format from the backend
+    """
+    try:
+        # Import shared interface config models (no runtime sys.path mutation).
+        from src.database.models import InterfaceConfig, EncryptionKey
+        
+        # Verify user owns this resource
+        user = get_user_by_id(db, user_id)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+        
+        # Get current interface config
+        config = db.query(InterfaceConfig).filter(
+            InterfaceConfig.user_id == user_id,
+            InterfaceConfig.is_current == True
+        ).first()
+        
+        if not config:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="No interface configuration found for this user"
+            )
+        
+        # Encrypted config is stored as an opaque string; the client needs the per-user salt
+        # for deterministic key derivation (see `encryption_keys.salt`).
+        # Best-effort UUID normalization (interface config user_id should be UUID in DB).
+        try:
+            import uuid as _uuid
+            normalized_user_id = _uuid.UUID(user_id) if isinstance(user_id, str) else user_id
+        except Exception:
+            normalized_user_id = user_id
+
+        encryption_key = db.query(EncryptionKey).filter(EncryptionKey.user_id == normalized_user_id).first()
+        salt = encryption_key.salt if encryption_key else None
+        return {
+            "encrypted_config": config.ui_config_encrypted,
+            "salt": salt,
+            "version": config.version,
+            "generated_at": config.generated_at.isoformat() if config.generated_at else None,
+            "user_id": str(config.user_id),
+            "theme": config.theme,
+            "primary_components": config.primary_components or [],
+            "hidden_components": config.hidden_components or [],
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error fetching interface config: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to fetch interface configuration"
+        )
+
+@app.get("/users/{user_id}/interface/version")
+async def get_user_interface_version(
+    user_id: str,
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    db: Session = Depends(get_db)
+):
+    """
+    Get current UIConfig version for a user (for update checking)
+    """
+    try:
+        from src.database.models import InterfaceConfig
+        
+        # Verify user owns this resource
+        user = get_user_by_id(db, user_id)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+        
+        # Get current interface config version
+        config = db.query(InterfaceConfig).filter(
+            InterfaceConfig.user_id == user_id,
+            InterfaceConfig.is_current == True
+        ).first()
+        
+        if not config:
+            return {
+                "version": None,
+                "generated_at": None
+            }
+        
+        return {
+            "version": config.version,
+            "generated_at": config.generated_at.isoformat() if config.generated_at else None
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error fetching interface version: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to fetch interface version"
+        )
 
 async def route_to_service(
     service_name: str, 

@@ -33,6 +33,10 @@ class Settings(BaseSettings):
     TWILIO_ACCOUNT_SID: str = os.getenv("TWILIO_ACCOUNT_SID", "")
     TWILIO_AUTH_TOKEN: str = os.getenv("TWILIO_AUTH_TOKEN", "")
     TWILIO_PHONE_NUMBER: str = os.getenv("TWILIO_PHONE_NUMBER", "")
+
+    # Escalation provider (behind env flags; stub is always available)
+    ESCALATION_PROVIDER: str = os.getenv("CRISIS_ESCALATION_PROVIDER", "stub")
+    ESCALATION_PROVIDER_ENABLED: bool = os.getenv("CRISIS_ESCALATION_PROVIDER_ENABLED", "0") == "1"
     
     # Database
     DATABASE_URL: str = os.getenv(

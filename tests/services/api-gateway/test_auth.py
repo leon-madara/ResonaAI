@@ -5,13 +5,13 @@ Unit tests for API Gateway authentication endpoints
 import pytest
 import sys
 import os
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch, MagicMock, AsyncMock
 from fastapi.testclient import TestClient
 import jwt
 from datetime import datetime, timedelta
 
 # Add services to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', '..', 'services', 'api-gateway'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', '..', 'apps', 'backend', 'gateway'))
 
 
 class TestAuthEndpoints:
@@ -20,13 +20,37 @@ class TestAuthEndpoints:
     @pytest.fixture
     def client(self):
         """Create test client with mocked dependencies"""
-        with patch('main.redis_client') as mock_redis, \
-             patch('main.health_checker') as mock_health, \
-             patch('main.http_client') as mock_http:
-            
+        # Ensure a clean import of the gateway app with deterministic settings/mocks.
+        for mod_name in list(sys.modules.keys()):
+            if mod_name in ["main", "config"] or mod_name.startswith("middleware."):
+                del sys.modules[mod_name]
+
+        with patch.dict(os.environ, {
+            "JWT_SECRET_KEY": "test-secret-key",
+            "JWT_ALGORITHM": "HS256",
+            "JWT_EXPIRATION_HOURS": "24",
+            "REDIS_HOST": "localhost",
+            "REDIS_PORT": "6379",
+        }), patch("redis.Redis") as mock_redis_cls, patch("httpx.AsyncClient") as mock_httpx_cls:
+
+            # Redis mock used by rate limiter middleware
+            mock_redis = Mock()
+            mock_pipe = Mock()
+            mock_pipe.zremrangebyscore.return_value = None
+            mock_pipe.zcard.return_value = None
+            mock_pipe.zadd.return_value = None
+            mock_pipe.expire.return_value = None
+            mock_pipe.execute.return_value = [None, 0, None, None]
+            mock_redis.pipeline.return_value = mock_pipe
+            mock_redis.zcount.return_value = 0
             mock_redis.ping.return_value = True
-            mock_health.check_all_services = Mock(return_value={})
-            
+            mock_redis_cls.return_value = mock_redis
+
+            # httpx client mock used by gateway routing
+            mock_http = AsyncMock()
+            mock_http.aclose = AsyncMock()
+            mock_httpx_cls.return_value = mock_http
+
             from main import app
             return TestClient(app)
     
@@ -61,33 +85,24 @@ class TestAuthEndpoints:
             assert "invalid" in response.json()["detail"].lower()
     
     def test_login_success(self, client, mock_db_session):
-        """Test successful login"""
-        from database import User
-        import uuid
-        
-        test_user = User(
-            id=uuid.uuid4(),
-            email="test@example.com",
-            password_hash="hashed_password",
-            consent_version="1.0",
-            is_anonymous=False,
-            created_at=datetime.utcnow(),
-            last_active=datetime.utcnow()
-        )
-        
+        """Test successful login (mocked auth + mocked DB)."""
+        fake_user = Mock()
+        fake_user.id = "user-123"
+        fake_user.email = "test@example.com"
+
         with patch('main.get_db', return_value=mock_db_session), \
-             patch('main.authenticate_user', return_value=test_user), \
+             patch('main.authenticate_user', return_value=fake_user), \
              patch('main.settings') as mock_settings:
-            
+
             mock_settings.JWT_SECRET_KEY = "test-secret-key"
             mock_settings.JWT_ALGORITHM = "HS256"
             mock_settings.JWT_EXPIRATION_HOURS = 24
-            
+
             response = client.post(
                 "/auth/login",
-                json={"email": "test@example.com", "password": "testpassword"}
+                json={"email": "test@example.com", "password": "testpassword123"}
             )
-            
+
             assert response.status_code == 200
             data = response.json()
             assert "access_token" in data
@@ -144,40 +159,37 @@ class TestAuthEndpoints:
             assert "already exists" in response.json()["detail"].lower()
     
     def test_register_success(self, client, mock_db_session):
-        """Test successful registration"""
-        from database import User
-        import uuid
-        
-        test_user = User(
-            id=uuid.uuid4(),
-            email="newuser@example.com",
-            password_hash="hashed_password",
-            consent_version="1.0",
-            is_anonymous=False,
-            created_at=datetime.utcnow(),
-            last_active=datetime.utcnow()
-        )
-        
+        """Test successful registration (mocked create_user + mocked email + mocked DB)."""
+        fake_user = Mock()
+        fake_user.id = "user-456"
+        fake_user.email = "newuser@example.com"
+
         with patch('main.get_db', return_value=mock_db_session), \
-             patch('main.create_user', return_value=test_user), \
+             patch('main.create_user', return_value=fake_user), \
+             patch('main.get_email_service') as mock_email, \
              patch('main.settings') as mock_settings:
-            
+
+            # Mock email service to avoid actual email sending
+            mock_email_service = Mock()
+            mock_email_service.generate_verification_token.return_value = "test-token"
+            mock_email_service.send_verification_email = AsyncMock(return_value=True)
+            mock_email.return_value = mock_email_service
+
             mock_settings.JWT_SECRET_KEY = "test-secret-key"
             mock_settings.JWT_ALGORITHM = "HS256"
             mock_settings.JWT_EXPIRATION_HOURS = 24
-            
+
             response = client.post("/auth/register", json={
                 "email": "newuser@example.com",
                 "password": "test123",
                 "consent_version": "1.0",
                 "is_anonymous": False
             })
-            
+
             assert response.status_code == 200
             data = response.json()
-            assert "message" in data
-            assert data["message"] == "User registered successfully"
             assert "user_id" in data
+            assert data["email"] == "newuser@example.com"
             assert "access_token" in data
             assert data["token_type"] == "bearer"
 

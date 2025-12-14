@@ -14,10 +14,18 @@ class Settings(BaseSettings):
     SERVICE_PORT: int = 8000
     DEBUG: bool = False
     
-    # Vector Database
+    # Vector Database - Pinecone
     PINECONE_API_KEY: str = os.getenv("PINECONE_API_KEY", "")
-    PINECONE_ENVIRONMENT: str = os.getenv("PINECONE_ENVIRONMENT", "")
+    PINECONE_ENVIRONMENT: str = os.getenv("PINECONE_ENVIRONMENT", "")  # Deprecated in v5+, kept for backward compatibility
     PINECONE_INDEX_NAME: str = "cultural-context"
+    
+    # Vector Database - Weaviate
+    WEAVIATE_URL: str = os.getenv("WEAVIATE_URL", "")
+    WEAVIATE_API_KEY: str = os.getenv("WEAVIATE_API_KEY", "")
+    
+    # Knowledge Base Indexing
+    AUTO_INDEX_KB: bool = os.getenv("AUTO_INDEX_KB", "true").lower() == "true"
+    KB_INDEX_BATCH_SIZE: int = int(os.getenv("KB_INDEX_BATCH_SIZE", "100"))
     
     # Database
     DATABASE_URL: str = os.getenv(

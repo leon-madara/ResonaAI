@@ -455,6 +455,12 @@ Comprehensive testing documentation is available in the `tests/` directory:
 
 ## Project Rules & Status Mapping
 
+### Implementation Review & Status
+
+For comprehensive implementation status and what remains to be done:
+- **[IMPLEMENTATION_REVIEW.md](IMPLEMENTATION_REVIEW.md)** - Complete review of System Design vs. Implementation, Design System status, and critical gaps
+- **[STATUS_SUMMARY.md](STATUS_SUMMARY.md)** - Quick reference summary of current status and next steps
+
 ### Test-Based Project Standards
 
 The test suite defines the **project standards** and **quality gates** for all microservices. See:

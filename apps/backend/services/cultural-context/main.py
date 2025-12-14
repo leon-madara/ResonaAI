@@ -7,26 +7,26 @@ from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from contextlib import asynccontextmanager
+from sqlalchemy.orm import Session
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 import json
 from typing import Any, Dict, List, Optional
 
-from sqlalchemy import create_engine, text
-
 from config import settings
+from database import get_db
+from repositories.cultural_repository import CulturalRepository
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 security = HTTPBearer()
 
-DATABASE_URL = os.getenv("DATABASE_URL", settings.DATABASE_URL)
-engine = create_engine(DATABASE_URL, pool_pre_ping=True)
-
 KB_DEFAULT_PATH = os.path.join(os.path.dirname(__file__), "data", "kb.json")
 KB_MOUNT_PATH = "/app/data/cultural-knowledge-base/kb.json"
+NORMS_DEFAULT_PATH = os.path.join(os.path.dirname(__file__), "data", "cultural_norms.json")
+NORMS_MOUNT_PATH = "/app/data/cultural-knowledge-base/cultural_norms.json"
 
 
 def _load_kb() -> Dict[str, Any]:
@@ -42,6 +42,30 @@ def _load_kb() -> Dict[str, Any]:
         return json.load(f)
 
 
+def _load_cultural_norms() -> Dict[str, Any]:
+    """
+    Load cultural norms from either mounted volume path or repo fallback.
+
+    Priority:
+    1) Docker volume mount: /app/data/cultural-knowledge-base/cultural_norms.json
+    2) Repo fallback: services/cultural-context/data/cultural_norms.json
+    
+    Returns:
+        Dictionary containing cultural norms, communication patterns, bias detection rules,
+        local resources, and cultural values. Returns empty dict if file not found.
+    """
+    path = NORMS_MOUNT_PATH if os.path.exists(NORMS_MOUNT_PATH) else NORMS_DEFAULT_PATH
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        logger.warning(f"Cultural norms file not found at {path}, using empty norms")
+        return {}
+    except Exception as e:
+        logger.warning(f"Failed to load cultural norms: {e}, using empty norms")
+        return {}
+
+
 def _detect_code_switching(text: str) -> Dict[str, Any]:
     """
     Detect code-switching between English and Swahili.
@@ -49,31 +73,34 @@ def _detect_code_switching(text: str) -> Dict[str, Any]:
     Returns:
         Dictionary with code_switching detected flag and detected languages.
     """
-    text_lower = text.lower()
-    
-    # Common Swahili words/phrases
-    swahili_indicators = [
-        "sawa", "nimechoka", "sijambo", "huzuni", "wasiwasi", "upweke",
-        "asante", "asante sana", "hofu", "pole", "pole sana", "karibu",
-        "mambo", "vipi", "poa", "shida", "hakuna", "hapana", "ndiyo"
-    ]
-    
-    # Detect Swahili words
-    swahili_words_found = [word for word in swahili_indicators if word in text_lower]
-    
-    # Detect English words (basic check)
-    english_indicators = ["i", "am", "feel", "feeling", "sad", "happy", "tired", "okay", "fine"]
-    english_words_found = [word for word in english_indicators if word in text_lower]
-    
-    # Code-switching detected if both languages present
-    code_switching_detected = len(swahili_words_found) > 0 and len(english_words_found) > 0
-    
-    return {
-        "code_switching_detected": code_switching_detected,
-        "swahili_words": swahili_words_found,
-        "english_words": english_words_found,
-        "intensity": "high" if len(swahili_words_found) > 2 else "medium" if len(swahili_words_found) > 0 else "low"
-    }
+    try:
+        from services.code_switch_analyzer import get_code_switch_analyzer
+        analyzer = get_code_switch_analyzer()
+        result = analyzer.analyze(text)
+        # Normalize keys so the rest of the service can rely on a consistent shape.
+        # - Some analyzers report `emotional_intensity`; older fallback uses `intensity`.
+        if "intensity" not in result:
+            result["intensity"] = result.get("emotional_intensity", "low")
+        return result
+    except Exception as e:
+        logger.warning(f"Code-switching analyzer failed, using fallback: {e}")
+        # Fallback to simple detection
+        text_lower = text.lower()
+        swahili_indicators = [
+            "sawa", "nimechoka", "sijambo", "huzuni", "wasiwasi", "upweke",
+            "asante", "asante sana", "hofu", "pole", "pole sana", "karibu",
+            "mambo", "vipi", "poa", "shida", "hakuna", "hapana", "ndiyo"
+        ]
+        swahili_words_found = [word for word in swahili_indicators if word in text_lower]
+        english_indicators = ["i", "am", "feel", "feeling", "sad", "happy", "tired", "okay", "fine"]
+        english_words_found = [word for word in english_indicators if word in text_lower]
+        code_switching_detected = len(swahili_words_found) > 0 and len(english_words_found) > 0
+        return {
+            "code_switching_detected": code_switching_detected,
+            "swahili_words": swahili_words_found,
+            "english_words": english_words_found,
+            "intensity": "high" if len(swahili_words_found) > 2 else "medium" if len(swahili_words_found) > 0 else "low"
+        }
 
 
 def _detect_deflection(text: str, language: str) -> Dict[str, Any]:
@@ -83,50 +110,84 @@ def _detect_deflection(text: str, language: str) -> Dict[str, Any]:
     Returns:
         Dictionary with deflection detected flag and pattern matched.
     """
-    text_lower = text.lower()
-    
-    # Swahili deflection patterns
-    swahili_deflections = {
-        "sawa": "Polite deflection - may indicate not ready to discuss",
-        "sijambo": "Stoic response - may mask deeper feelings",
-        "hakuna shida": "No problem - may minimize concerns",
-        "poa": "Cool/fine - casual deflection"
-    }
-    
-    # English deflection patterns
-    english_deflections = {
-        "i'm fine": "Common deflection",
-        "it's okay": "Minimizing response",
-        "no problem": "Dismissive response",
-        "nothing": "Stoic response"
-    }
-    
-    deflection_patterns = swahili_deflections if language == "sw" else english_deflections
-    deflection_patterns.update(swahili_deflections)  # Always check Swahili patterns
-    
-    detected_deflections = []
-    for pattern, meaning in deflection_patterns.items():
-        if pattern in text_lower:
-            detected_deflections.append({
-                "pattern": pattern,
-                "meaning": meaning,
-                "language": "sw" if pattern in swahili_deflections else "en"
-            })
-    
-    return {
-        "deflection_detected": len(detected_deflections) > 0,
-        "patterns": detected_deflections
-    }
+    try:
+        from services.deflection_detector import get_deflection_detector
+        detector = get_deflection_detector()
+        result = detector.analyze(text, language=language)
+        # Normalize keys so downstream code can safely access `patterns`.
+        # - Detector implementations vary; some return `matches` instead.
+        if "patterns" not in result:
+            result["patterns"] = result.get("matches", []) or []
+        return result
+    except Exception as e:
+        logger.warning(f"Deflection detector failed, using fallback: {e}")
+        # Fallback to simple detection
+        text_lower = text.lower()
+        swahili_deflections = {
+            "sawa": "Polite deflection - may indicate not ready to discuss",
+            "sijambo": "Stoic response - may mask deeper feelings",
+            "hakuna shida": "No problem - may minimize concerns",
+            "poa": "Cool/fine - casual deflection"
+        }
+        english_deflections = {
+            "i'm fine": "Common deflection",
+            "it's okay": "Minimizing response",
+            "no problem": "Dismissive response",
+            "nothing": "Stoic response"
+        }
+        deflection_patterns = swahili_deflections if language == "sw" else english_deflections
+        deflection_patterns.update(swahili_deflections)
+        detected_deflections = []
+        for pattern, meaning in deflection_patterns.items():
+            if pattern in text_lower:
+                detected_deflections.append({
+                    "pattern": pattern,
+                    "meaning": meaning,
+                    "language": "sw" if pattern in swahili_deflections else "en"
+                })
+        return {
+            "deflection_detected": len(detected_deflections) > 0,
+            "patterns": detected_deflections
+        }
 
 
-def _retrieve_entries(kb: Dict[str, Any], query: str, language: str) -> List[Dict[str, Any]]:
+def _retrieve_entries(kb: Dict[str, Any], query: str, language: str, use_rag: bool = True) -> List[Dict[str, Any]]:
     """
-    Simple keyword-based retrieval with enhanced pattern matching.
+    Retrieve entries using RAG (if available) or keyword-based fallback.
 
     Purpose:
-    - Provide retrieval-backed responses without requiring a vector DB.
+    - Use semantic search via RAG when vector DB is configured.
+    - Fallback to keyword-based retrieval when RAG unavailable.
     - Includes code-switching and deflection detection.
     """
+    # Try RAG first if available
+    if use_rag:
+        try:
+            from services.rag_service import get_rag_service
+            rag_service = get_rag_service()
+            
+            if rag_service.is_available():
+                rag_results = rag_service.search(query, top_k=3, language=language)
+                if rag_results:
+                    # Convert RAG results to entry format
+                    entries = kb.get("entries", []) or []
+                    entry_map = {e.get("id"): e for e in entries}
+                    
+                    retrieved = []
+                    for result in rag_results:
+                        entry_id = result.get("id")
+                        if entry_id in entry_map:
+                            entry = entry_map[entry_id].copy()
+                            entry["rag_score"] = result.get("score", 0)
+                            retrieved.append(entry)
+                    
+                    if retrieved:
+                        logger.info(f"RAG retrieval found {len(retrieved)} entries")
+                        return retrieved
+        except Exception as e:
+            logger.warning(f"RAG retrieval failed, falling back to keyword search: {e}")
+    
+    # Fallback to keyword-based retrieval
     q = query.lower()
     entries = kb.get("entries", []) or []
 
@@ -149,52 +210,102 @@ def _retrieve_entries(kb: Dict[str, Any], query: str, language: str) -> List[Dic
     return [s["entry"] for s in scored[:3]]
 
 
-def _get_cache(context_key: str) -> Optional[Dict[str, Any]]:
+def _get_cache(context_key: str, db: Session) -> Optional[Dict[str, Any]]:
     """Fetch cached context if present and not expired."""
     try:
-        with engine.connect() as conn:
-            row = conn.execute(
-                text(
-                    """
-                    SELECT context_data
-                    FROM cultural_context_cache
-                    WHERE context_key = :key
-                      AND (expires_at IS NULL OR expires_at > NOW())
-                    """
-                ),
-                {"key": context_key},
-            ).fetchone()
-        if not row:
-            return None
-        return row[0]
+        cultural_repo = CulturalRepository(db)
+        cache_entry = cultural_repo.get_cached_context(context_key)
+        if cache_entry:
+            return cache_entry.context_data
+        return None
     except Exception as e:
         logger.warning(f"Cache read failed: {e}")
         return None
 
 
-def _set_cache(context_key: str, payload: Dict[str, Any], language: str) -> None:
+def _set_cache(context_key: str, payload: Dict[str, Any], language: str, db: Session) -> None:
     """Upsert cached context payload (best-effort)."""
     try:
-        with engine.begin() as conn:
-            conn.execute(
-                text(
-                    """
-                    INSERT INTO cultural_context_cache (context_key, context_data, language, region, created_at, updated_at)
-                    VALUES (:key, :data::jsonb, :language, 'east_africa', NOW(), NOW())
-                    ON CONFLICT (context_key)
-                    DO UPDATE SET context_data = EXCLUDED.context_data, updated_at = NOW()
-                    """
-                ),
-                {"key": context_key, "data": json.dumps(payload), "language": language},
-            )
+        cultural_repo = CulturalRepository(db)
+        cultural_repo.cache_context(
+            context_key=context_key,
+            context_data=payload,
+            language=language,
+            region="east_africa",
+            expires_in_hours=24
+        )
     except Exception as e:
         logger.warning(f"Cache write failed: {e}")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Starting Cultural Context Service...")
+    
+    # Initialize RAG service and index knowledge base on startup
+    if settings.AUTO_INDEX_KB:
+        try:
+            from services.rag_service import get_rag_service
+            
+            logger.info("Initializing RAG service...")
+            rag_service = get_rag_service()
+            
+            # Check vector DB connection
+            connection_status = rag_service.check_connection()
+            logger.info(f"Vector DB connection status: {connection_status}")
+            
+            # Ensure index exists (for Pinecone)
+            if rag_service.vector_db_type == "pinecone":
+                logger.info("Ensuring Pinecone index exists...")
+                if rag_service.ensure_index_exists():
+                    logger.info("Pinecone index ready")
+                else:
+                    logger.warning("Failed to ensure Pinecone index exists, falling back to in-memory")
+            
+            # Load and index knowledge base
+            try:
+                kb = _load_kb()
+                kb_entries = kb.get("entries", [])
+                
+                if kb_entries:
+                    logger.info(f"Indexing {len(kb_entries)} knowledge base entries...")
+                    indexed_count = rag_service.index_knowledge_base(kb_entries)
+                    logger.info(f"Successfully indexed {indexed_count}/{len(kb_entries)} entries")
+                    
+                    # Log index stats
+                    stats = rag_service.get_index_stats()
+                    logger.info(f"Vector DB stats: {stats}")
+                else:
+                    logger.warning("No knowledge base entries found to index")
+                    
+            except FileNotFoundError:
+                logger.warning("Knowledge base file not found, skipping indexing")
+            except Exception as e:
+                logger.error(f"Failed to load or index knowledge base: {e}")
+                
+        except Exception as e:
+            logger.error(f"Failed to initialize RAG service: {e}")
+            logger.info("Service will continue with keyword-based search fallback")
+    else:
+        logger.info("Auto-indexing disabled (AUTO_INDEX_KB=false)")
+    
     yield
+    
     logger.info("Shutting down Cultural Context Service...")
+    
+    # Cleanup vector DB connections
+    try:
+        from services.rag_service import get_rag_service
+        rag_service = get_rag_service()
+        
+        # Close Weaviate connection if exists
+        if rag_service.weaviate_client:
+            try:
+                rag_service.weaviate_client.close()
+                logger.info("Closed Weaviate connection")
+            except:
+                pass
+    except:
+        pass
 
 app = FastAPI(title="Cultural Context Service", version="1.0.0", lifespan=lifespan)
 
@@ -207,21 +318,37 @@ app.add_middleware(
 )
 
 @app.get("/health")
-async def health_check():
+async def health_check(db: Session = Depends(get_db)):
     db_ok = False
     try:
-        with engine.connect() as conn:
-            conn.execute(text("SELECT 1"))
+        # Simple query to test connection
+        cultural_repo = CulturalRepository(db)
+        # Just check if we can create a repo (tests connection)
         db_ok = True
     except Exception as e:
         logger.warning(f"DB health check failed: {e}")
+    
+    # Check vector DB status
+    vector_db_status = {"type": "not_initialized", "connected": False}
+    try:
+        from services.rag_service import get_rag_service
+        rag_service = get_rag_service()
+        vector_db_status = rag_service.check_connection()
+    except Exception as e:
+        vector_db_status["error"] = str(e)
 
-    return {"status": "healthy", "service": "cultural-context", "db_connected": db_ok}
+    return {
+        "status": "healthy", 
+        "service": "cultural-context", 
+        "db_connected": db_ok,
+        "vector_db": vector_db_status
+    }
 
 @app.get("/context")
 async def get_cultural_context(
     query: str,
     language: str = "en",
+    db: Session = Depends(get_db),
     credentials: HTTPAuthorizationCredentials = Depends(security)
 ):
     """Get cultural context for a query"""
@@ -230,24 +357,71 @@ async def get_cultural_context(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="query is required")
 
     context_key = f"{language}:{q.lower()}"
-    cached = _get_cache(context_key)
+    cached = _get_cache(context_key, db)
     if cached:
         cached["source"] = "db_cache"
-        cached["timestamp"] = datetime.utcnow().isoformat()
+        cached["timestamp"] = datetime.now(timezone.utc).isoformat()
         return cached
 
     kb = _load_kb()
-    retrieved = _retrieve_entries(kb, q, language)
+    cultural_norms = _load_cultural_norms()
+    
+    # Check if RAG should be used (default: True if available)
+    use_rag = os.getenv("USE_RAG", "true").lower() == "true"
+    retrieved = _retrieve_entries(kb, q, language, use_rag=use_rag)
     
     # Detect code-switching and deflection
     code_switching_info = _detect_code_switching(q)
     deflection_info = _detect_deflection(q, language)
 
-    context_lines = [
-        "Be mindful of East African norms around privacy, respect, and indirect expression of distress.",
-        "Avoid stigmatizing language; normalize help-seeking and community support.",
-        "If the user prefers Swahili or code-switching, mirror their language style gently.",
-    ]
+    # Build context lines, enriched with cultural norms if available
+    context_lines = []
+    
+    # Use cultural norms if available, otherwise use default guidance
+    if cultural_norms and "cultural_values" in cultural_norms:
+        values = cultural_norms["cultural_values"]
+        if "privacy_and_family_reputation" in values:
+            context_lines.append(
+                "Be mindful of East African norms around privacy, respect, and indirect expression of distress. "
+                "Family reputation is highly valued, and mental health issues may be hidden to protect it."
+            )
+        else:
+            context_lines.append(
+                "Be mindful of East African norms around privacy, respect, and indirect expression of distress."
+            )
+        
+        if "stigma_and_help_seeking_barriers" in values:
+            context_lines.append(
+                "Avoid stigmatizing language; normalize help-seeking and community support. "
+                "Acknowledge the courage it takes to seek help and frame it as strength, not weakness."
+            )
+        else:
+            context_lines.append(
+                "Avoid stigmatizing language; normalize help-seeking and community support."
+            )
+    else:
+        # Fallback to default guidance
+        context_lines = [
+            "Be mindful of East African norms around privacy, respect, and indirect expression of distress.",
+            "Avoid stigmatizing language; normalize help-seeking and community support.",
+        ]
+    
+    # Language preference guidance
+    if cultural_norms and "communication_patterns" in cultural_norms:
+        comm_patterns = cultural_norms["communication_patterns"]
+        if "language_preferences" in comm_patterns:
+            context_lines.append(
+                "If the user prefers Swahili or code-switching, mirror their language style gently. "
+                "Code-switching often indicates emotional intensity - pay attention when language changes."
+            )
+        else:
+            context_lines.append(
+                "If the user prefers Swahili or code-switching, mirror their language style gently."
+            )
+    else:
+        context_lines.append(
+            "If the user prefers Swahili or code-switching, mirror their language style gently."
+        )
     
     # Add code-switching context if detected
     if code_switching_info["code_switching_detected"]:
@@ -276,11 +450,124 @@ async def get_cultural_context(
         "matches": [{"id": e.get("id"), "keywords": e.get("keywords")} for e in retrieved],
         "code_switching": code_switching_info,
         "deflection": deflection_info,
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
     }
+    
+    # Add cultural norms metadata if available
+    if cultural_norms:
+        payload["cultural_norms_loaded"] = True
+        payload["cultural_norms_version"] = cultural_norms.get("version", "unknown")
+    else:
+        payload["cultural_norms_loaded"] = False
 
-    _set_cache(context_key, payload, language)
+    _set_cache(context_key, payload, language, db)
     return payload
+
+
+@app.post("/bias-check")
+async def check_bias(
+    text: str,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Check text for biases and cultural sensitivity"""
+    if not text or not text.strip():
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="text is required")
+    
+    try:
+        from services.bias_detector import get_bias_detector
+        detector = get_bias_detector()
+        assessment = detector.assess_overall_sensitivity(text)
+        return assessment
+    except Exception as e:
+        logger.error(f"Bias detection failed: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Bias detection failed: {str(e)}"
+        )
+
+
+@app.post("/index-kb")
+async def index_knowledge_base_endpoint(
+    clear_existing: bool = False,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """
+    Manually trigger knowledge base re-indexing.
+    
+    Args:
+        clear_existing: If True, clear existing vectors before re-indexing
+        
+    Returns:
+        Dictionary with indexing results
+    """
+    try:
+        from services.rag_service import get_rag_service
+        
+        rag_service = get_rag_service()
+        
+        # Check if vector DB is available
+        if rag_service.vector_db_type == "memory":
+            logger.warning("Vector DB not configured, using in-memory storage")
+        
+        # Clear existing vectors if requested
+        if clear_existing:
+            logger.info("Clearing existing vectors...")
+            if rag_service.clear_index():
+                logger.info("Successfully cleared existing vectors")
+            else:
+                logger.warning("Failed to clear existing vectors")
+        
+        # Ensure index exists (for Pinecone)
+        if rag_service.vector_db_type == "pinecone":
+            if not rag_service.ensure_index_exists():
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Failed to ensure Pinecone index exists"
+                )
+        
+        # Load and index knowledge base
+        try:
+            kb = _load_kb()
+            kb_entries = kb.get("entries", [])
+            
+            if not kb_entries:
+                return {
+                    "success": True,
+                    "message": "No knowledge base entries found to index",
+                    "indexed_count": 0,
+                    "total_entries": 0
+                }
+            
+            logger.info(f"Indexing {len(kb_entries)} knowledge base entries...")
+            indexed_count = rag_service.index_knowledge_base(kb_entries)
+            
+            # Get index stats
+            stats = rag_service.get_index_stats()
+            
+            return {
+                "success": True,
+                "message": f"Successfully indexed {indexed_count}/{len(kb_entries)} entries",
+                "indexed_count": indexed_count,
+                "total_entries": len(kb_entries),
+                "vector_db_type": rag_service.vector_db_type,
+                "stats": stats
+            }
+            
+        except FileNotFoundError:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Knowledge base file not found"
+            )
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to index knowledge base: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to index knowledge base: {str(e)}"
+        )
+
 
 if __name__ == "__main__":
     import uvicorn

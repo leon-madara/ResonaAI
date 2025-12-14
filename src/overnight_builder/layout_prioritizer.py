@@ -6,13 +6,8 @@ Risk-based prioritization ensures critical components are always visible first.
 """
 
 from typing import List, Dict, Tuple
-import sys
-import os
 
-# Add parent directory to path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from pattern_analysis.pattern_aggregator import AggregatedPatterns
+from src.pattern_analysis.pattern_aggregator import AggregatedPatterns
 from .component_visibility import ComponentConfig
 
 

@@ -5,6 +5,7 @@ Authentication middleware for API Gateway
 import jwt
 from typing import Callable, Optional
 from fastapi import Request, HTTPException, status
+from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 from datetime import datetime
 import logging
@@ -38,19 +39,19 @@ class AuthMiddleware(BaseHTTPMiddleware):
         # Check for Authorization header
         auth_header = request.headers.get("Authorization")
         if not auth_header:
-            raise HTTPException(
+            return JSONResponse(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Authorization header required",
-                headers={"WWW-Authenticate": "Bearer"}
+                content={"detail": "Authorization header required"},
+                headers={"WWW-Authenticate": "Bearer"},
             )
         
         # Validate JWT token
         try:
             if not auth_header.startswith("Bearer "):
-                raise HTTPException(
+                return JSONResponse(
                     status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Invalid authorization header format",
-                    headers={"WWW-Authenticate": "Bearer"}
+                    content={"detail": "Invalid authorization header format"},
+                    headers={"WWW-Authenticate": "Bearer"},
                 )
             
             token = auth_header.split(" ")[1]
@@ -62,23 +63,23 @@ class AuthMiddleware(BaseHTTPMiddleware):
             request.state.token_payload = payload
             
         except jwt.ExpiredSignatureError:
-            raise HTTPException(
+            return JSONResponse(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Token has expired",
-                headers={"WWW-Authenticate": "Bearer"}
+                content={"detail": "Token has expired"},
+                headers={"WWW-Authenticate": "Bearer"},
             )
         except jwt.InvalidTokenError:
-            raise HTTPException(
+            return JSONResponse(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid token",
-                headers={"WWW-Authenticate": "Bearer"}
+                content={"detail": "Invalid token"},
+                headers={"WWW-Authenticate": "Bearer"},
             )
         except Exception as e:
             logger.error(f"Authentication error: {str(e)}")
-            raise HTTPException(
+            return JSONResponse(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Authentication failed",
-                headers={"WWW-Authenticate": "Bearer"}
+                content={"detail": "Authentication failed"},
+                headers={"WWW-Authenticate": "Bearer"},
             )
         
         return await call_next(request)

@@ -7,7 +7,7 @@
 - Test Standards: `tests/README.md`, `tests/TEST_STATUS_REPORT.md`
 - Completed Work: `Completed/07-Documentation.md`
 - In Progress: `In Progress/README.md`
-- To Do: `To Do/README.md`
+- To Do: `project/backlog/README.md`
 
 ---
 

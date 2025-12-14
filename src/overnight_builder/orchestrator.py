@@ -9,14 +9,9 @@ import asyncio
 from typing import List, Dict, Optional
 from datetime import datetime, timedelta
 import logging
-import sys
-import os
 
-# Add parent directory to path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from database.pattern_storage import PatternStorageService
-from pattern_analysis.pattern_aggregator import PatternAggregator, AggregatedPatterns
+from src.database.pattern_storage import PatternStorageService
+from src.pattern_analysis.pattern_aggregator import PatternAggregator, AggregatedPatterns
 from .ui_config_generator import UIConfigGenerator, UIConfig
 from .encryption_service import EncryptionService
 
@@ -320,7 +315,7 @@ class OvernightBuilder:
 
         # This would use PatternAggregator.from_dict() method
         # For now, placeholder - assumes the dict structure matches AggregatedPatterns
-        from pattern_analysis.pattern_aggregator import (
+        from src.pattern_analysis.pattern_aggregator import (
             EmotionalPattern,
             DissonanceResult,
             CulturalContext,

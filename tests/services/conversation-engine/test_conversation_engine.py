@@ -20,7 +20,7 @@ class TestConversationEngine:
     def client(self):
         """Create test client with mocked dependencies"""
         # Change to service directory for imports
-        service_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'services', 'conversation-engine'))
+        service_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'apps', 'backend', 'services', 'conversation-engine'))
         old_cwd = os.getcwd()
         os.chdir(service_dir)
         
@@ -34,11 +34,62 @@ class TestConversationEngine:
                 if mod_name in ['main', 'config'] or mod_name.startswith('models.conversation'):
                     del sys.modules[mod_name]
             
-            with patch('main.gpt_service') as mock_gpt:
+            with patch.dict(os.environ, {"DATABASE_URL": "sqlite:///:memory:"}), \
+                 patch('main.gpt_service') as mock_gpt, \
+                 patch('main.httpx.AsyncClient') as mock_httpx_client, \
+                 patch('main.EncryptionClient') as mock_encryption_client, \
+                 patch('main.ConversationRepository') as mock_repo_cls:
                 mock_gpt.generate_response = AsyncMock(return_value="I understand how you're feeling. Let's talk about it.")
+
+                # Fake http client created during lifespan
+                fake_http = AsyncMock()
+                fake_http.aclose = AsyncMock()
+                mock_httpx_client.return_value = fake_http
+
+                # Fake encryption client created during lifespan
+                fake_encryption = AsyncMock()
+
+                async def _encrypt_text(*, plaintext: str, key_id=None):
+                    # Return stable ciphertext bytes (not plaintext)
+                    return type("Enc", (), {"ciphertext": b"ciphertext", "key_id": key_id or "default"})()
+
+                fake_encryption.encrypt_text = AsyncMock(side_effect=_encrypt_text)
+                fake_encryption.decrypt_text = AsyncMock(return_value="decrypted")
+                mock_encryption_client.return_value = fake_encryption
+
+                # Fake repository for DB operations
+                class _FakeConversation:
+                    def __init__(self, cid):
+                        self.id = cid
+
+                class _FakeRepo:
+                    def __init__(self, _db):
+                        self.created_messages = []
+
+                    def get_conversation(self, conversation_id):
+                        return _FakeConversation(conversation_id)
+
+                    def create_conversation(self, user_id, emotion_summary=None):
+                        import uuid as _uuid
+                        return _FakeConversation(_uuid.uuid4())
+
+                    def get_conversation_messages(self, conversation_id):
+                        return []
+
+                    def create_message(self, conversation_id, message_type, encrypted_content, emotion_data=None):
+                        self.created_messages.append(encrypted_content)
+                        import uuid as _uuid
+                        return Mock(id=str(_uuid.uuid4()))
+
+                fake_repo = _FakeRepo(None)
+                mock_repo_cls.return_value = fake_repo
                 
                 from main import app
-                yield TestClient(app)
+                with TestClient(app) as client:
+                    # Expose fakes for assertions
+                    client.app.state._fake_repo = fake_repo
+                    client.app.state._fake_encryption = fake_encryption
+                    yield client
         finally:
             os.chdir(old_cwd)
             if service_dir in sys.path:
@@ -161,6 +212,51 @@ class TestConversationEngine:
         assert response.status_code == 200
         data = response.json()
         assert data["conversation_id"] == conversation_id
+
+    def test_chat_stores_encrypted_messages(self, client, auth_token):
+        """Ensure stored messages are encrypted (no plaintext at rest)."""
+        request_data = {
+            "user_id": "test-user",
+            "message": "Hello world",
+            "emotion_context": None,
+            "dissonance_context": None,
+            "cultural_context": None
+        }
+
+        response = client.post(
+            "/chat",
+            json=request_data,
+            headers={"Authorization": auth_token}
+        )
+
+        assert response.status_code == 200
+        stored = client.app.state._fake_repo.created_messages
+        assert stored, "Expected message persistence to be attempted"
+        # The fake encryption client returns b\"ciphertext\" for all encryptions.
+        assert all(m == b"ciphertext" for m in stored)
+
+    def test_chat_does_not_store_plaintext_on_encryption_failure(self, client, auth_token):
+        """If encryption fails, we should not store plaintext bytes."""
+        # Force encryption to fail
+        client.app.state._fake_encryption.encrypt_text = AsyncMock(side_effect=Exception("encryption down"))
+        client.app.state._fake_repo.created_messages.clear()
+
+        request_data = {
+            "user_id": "test-user",
+            "message": "Sensitive content",
+            "emotion_context": None,
+            "dissonance_context": None,
+            "cultural_context": None
+        }
+
+        response = client.post(
+            "/chat",
+            json=request_data,
+            headers={"Authorization": auth_token}
+        )
+
+        assert response.status_code == 200
+        assert client.app.state._fake_repo.created_messages == []
     
     def test_chat_missing_message(self, client, auth_token):
         """Test chat with missing message"""

@@ -10,10 +10,10 @@ import logging
 from loguru import logger
 from datetime import datetime
 
-from src.config import settings
-from src.models import EmotionResult, StreamingConfig
-from src.audio_processor import AudioProcessor
-from src.emotion_detector import EmotionDetector
+from .config import settings
+from .models import EmotionResult, StreamingConfig
+from .audio_processor import AudioProcessor
+from .emotion_detector import EmotionDetector
 
 class StreamingProcessor:
     """Real-time streaming audio processor for emotion detection"""

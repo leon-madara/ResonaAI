@@ -7,13 +7,8 @@ Provides transparency - users understand why their interface changed.
 
 from typing import List, Dict, Optional
 from dataclasses import dataclass
-import sys
-import os
 
-# Add parent directory to path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from pattern_analysis.pattern_aggregator import AggregatedPatterns
+from src.pattern_analysis.pattern_aggregator import AggregatedPatterns
 
 
 @dataclass

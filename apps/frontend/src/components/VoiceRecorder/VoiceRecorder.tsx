@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useAudioRecorder } from 'react-audio-voice-recorder';
 import { Mic, MicOff, Square, Play, Pause, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -43,70 +43,10 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
     startRecording,
     stopRecording,
     recordingBlob,
-    isRecording: recorderIsRecording,
-    recordingTime: recorderTime
   } = useAudioRecorder();
 
-  const startRecordingHandler = useCallback(async () => {
-    try {
-      if (!isOnline && !navigator.onLine) {
-        toast.error('Recording requires internet connection');
-        return;
-      }
-
-      setIsRecording(true);
-      setRecordingTime(0);
-      setAudioBlob(null);
-      setAudioUrl(null);
-      
-      await startRecording();
-      
-      // Start timer
-      timerRef.current = setInterval(() => {
-        setRecordingTime(prev => {
-          if (prev >= maxDuration) {
-            stopRecordingHandler();
-            return prev;
-          }
-          return prev + 1;
-        });
-      }, 1000);
-      
-      toast.success('Recording started');
-    } catch (error) {
-      console.error('Failed to start recording:', error);
-      toast.error('Failed to start recording');
-      setIsRecording(false);
-    }
-  }, [startRecording, isOnline, maxDuration]);
-
-  const stopRecordingHandler = useCallback(async () => {
-    try {
-      setIsRecording(false);
-      
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
-      
-      const blob = await stopRecording();
-      if (blob) {
-        setAudioBlob(blob);
-        const url = URL.createObjectURL(blob);
-        setAudioUrl(url);
-        
-        // Process recording
-        await processRecording(blob);
-        
-        toast.success('Recording completed');
-      }
-    } catch (error) {
-      console.error('Failed to stop recording:', error);
-      toast.error('Failed to stop recording');
-    }
-  }, [stopRecording]);
-
-  const processRecording = async (blob: Blob) => {
+  // Define processRecording before using it in useEffect
+  const processRecording = useCallback(async (blob: Blob) => {
     setIsProcessing(true);
     
     try {
@@ -151,7 +91,73 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
     } finally {
       setIsProcessing(false);
     }
-  };
+  }, [apiBaseUrl, token, updateEmotionState, onRecordingComplete, onTranscriptionComplete]);
+
+  // Handle recordingBlob when it becomes available after stopRecording()
+  useEffect(() => {
+    if (recordingBlob) {
+      setAudioBlob(recordingBlob);
+      const url = URL.createObjectURL(recordingBlob);
+      setAudioUrl(url);
+      
+      // Process recording
+      processRecording(recordingBlob);
+      
+      toast.success('Recording completed');
+    }
+  }, [recordingBlob, processRecording]);
+
+  const stopRecordingHandler = useCallback(() => {
+    try {
+      setIsRecording(false);
+      
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+      
+      // stopRecording() returns void; the blob is provided via recordingBlob state
+      stopRecording();
+      
+      toast.success('Recording stopped');
+    } catch (error) {
+      console.error('Failed to stop recording:', error);
+      toast.error('Failed to stop recording');
+    }
+  }, [stopRecording]);
+
+  const startRecordingHandler = useCallback(async () => {
+    try {
+      if (!isOnline && !navigator.onLine) {
+        toast.error('Recording requires internet connection');
+        return;
+      }
+
+      setIsRecording(true);
+      setRecordingTime(0);
+      setAudioBlob(null);
+      setAudioUrl(null);
+      
+      await startRecording();
+      
+      // Start timer
+      timerRef.current = setInterval(() => {
+        setRecordingTime(prev => {
+          if (prev >= maxDuration) {
+            stopRecordingHandler();
+            return prev;
+          }
+          return prev + 1;
+        });
+      }, 1000);
+      
+      toast.success('Recording started');
+    } catch (error) {
+      console.error('Failed to start recording:', error);
+      toast.error('Failed to start recording');
+      setIsRecording(false);
+    }
+  }, [startRecording, isOnline, maxDuration, stopRecordingHandler]);
 
   const playRecording = useCallback(() => {
     if (audioRef.current && audioUrl) {

@@ -1,0 +1,171 @@
+.voice-recorder-ds {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 2rem;
+  border-radius: 16px;
+  background: var(--card-bg, #ffffff);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.voice-recorder-ds--low {
+  border: 2px solid #e5e7eb;
+}
+
+.voice-recorder-ds--medium {
+  border: 2px solid #fbbf24;
+}
+
+.voice-recorder-ds--high {
+  border: 2px solid #ef4444;
+  background: #fef2f2;
+}
+
+.voice-recorder-ds__prompt {
+  text-align: center;
+}
+
+.voice-recorder-ds__prompt-text {
+  font-size: 1.125rem;
+  line-height: 1.6;
+  color: var(--text-color, #111827);
+  margin: 0;
+}
+
+.voice-recorder-ds__prompt-text--swahili {
+  font-style: italic;
+}
+
+.voice-recorder-ds__prompt-text--mixed {
+  font-style: italic;
+}
+
+.voice-recorder-ds__controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.voice-recorder-ds__button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.voice-recorder-ds__button--low {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.voice-recorder-ds__button--medium {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+}
+
+.voice-recorder-ds__button--high {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+}
+
+.voice-recorder-ds__button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.voice-recorder-ds__icon {
+  width: 2rem;
+  height: 2rem;
+}
+
+.voice-recorder-ds__button-text {
+  font-size: 0.875rem;
+}
+
+.voice-recorder-ds__timer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+}
+
+.voice-recorder-ds__pulse {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ef4444;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+}
+
+.voice-recorder-ds__waveform {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 80px;
+  padding: 1rem;
+}
+
+.voice-recorder-ds__waveform-bar {
+  width: 4px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 2px;
+  min-height: 20px;
+}
+
+.voice-recorder-ds__ambient {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100px;
+}
+
+.voice-recorder-ds__ambient-circle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.1) 100%);
+  border: 2px solid rgba(102, 126, 234, 0.5);
+}
+
+.voice-recorder-ds--minimal .voice-recorder-ds__waveform,
+.voice-recorder-ds--minimal .voice-recorder-ds__ambient {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .voice-recorder-ds {
+    padding: 1.5rem;
+  }
+
+  .voice-recorder-ds__prompt-text {
+    font-size: 1rem;
+  }
+
+  .voice-recorder-ds__button {
+    padding: 1.25rem;
+  }
+}
+

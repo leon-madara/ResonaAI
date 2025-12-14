@@ -18,7 +18,7 @@ import json
 from config import settings
 from models.encryption_models import (
     EncryptionRequest, DecryptionRequest, KeyRotationRequest,
-    BatchEncryptRequest, BatchDecryptRequest
+    BatchEncryptRequest, BatchDecryptRequest, ReEncryptRequest
 )
 
 # Configure logging
@@ -102,8 +102,17 @@ class EncryptionManager:
             logger.error(f"Decryption failed: {str(e)}")
             raise HTTPException(status_code=500, detail="Decryption failed")
     
-    def rotate_key(self, new_key: Optional[bytes] = None) -> Dict[str, Any]:
-        """Rotate encryption key"""
+    def rotate_key(self, new_key: Optional[bytes] = None, keep_old_key: bool = False) -> Dict[str, Any]:
+        """
+        Rotate encryption key
+        
+        Args:
+            new_key: New encryption key (generates new if None)
+            keep_old_key: If True, keeps old key accessible for re-encryption
+            
+        Returns:
+            Rotation record with old_key if keep_old_key=True
+        """
         try:
             old_key = self.master_key
             
@@ -125,12 +134,29 @@ class EncryptionManager:
                 "timestamp": datetime.utcnow().isoformat()
             }
             
+            # Store old key temporarily if needed for re-encryption
+            if keep_old_key:
+                rotation_record["old_key"] = base64.b64encode(old_key).decode('utf-8')
+                # Store old key temporarily (will be cleared after re-encryption)
+                self._old_key = old_key
+            else:
+                self._old_key = None
+            
             logger.info("Encryption key rotated successfully")
             return rotation_record
             
         except Exception as e:
             logger.error(f"Key rotation failed: {str(e)}")
             raise HTTPException(status_code=500, detail="Key rotation failed")
+    
+    def get_old_key(self) -> Optional[bytes]:
+        """Get the old key if it was kept during rotation"""
+        return getattr(self, '_old_key', None)
+    
+    def clear_old_key(self):
+        """Clear the old key after re-encryption is complete"""
+        if hasattr(self, '_old_key'):
+            delattr(self, '_old_key')
     
     def generate_user_key(self, user_id: str, password: str) -> bytes:
         """Generate user-specific encryption key"""
@@ -149,6 +175,58 @@ class EncryptionManager:
         except Exception as e:
             logger.error(f"User key generation failed: {str(e)}")
             raise HTTPException(status_code=500, detail="User key generation failed")
+    
+    def reencrypt_data(
+        self,
+        encrypted_data: str,
+        old_key: Optional[bytes] = None,
+        new_key: Optional[bytes] = None
+    ) -> Dict[str, Any]:
+        """
+        Re-encrypt data with a new key
+        
+        Args:
+            encrypted_data: Base64 encoded encrypted data
+            old_key: Old encryption key (uses stored old key or current key if None)
+            new_key: New encryption key (uses current master key if None)
+            
+        Returns:
+            Re-encrypted data result
+        """
+        try:
+            # Use stored old key if available, otherwise use current key
+            if old_key is None:
+                old_key = self.get_old_key() or self.master_key
+            
+            # Use current master key as new key if not provided
+            if new_key is None:
+                new_key = self.master_key
+            
+            # Create Fernet instances
+            old_fernet = Fernet(old_key)
+            new_fernet = Fernet(new_key)
+            
+            # Decode from base64
+            encrypted_bytes = base64.b64decode(encrypted_data.encode('utf-8'))
+            
+            # Decrypt with old key
+            decrypted_bytes = old_fernet.decrypt(encrypted_bytes)
+            
+            # Encrypt with new key
+            reencrypted_data = new_fernet.encrypt(decrypted_bytes)
+            
+            # Encode for storage
+            reencrypted_b64 = base64.b64encode(reencrypted_data).decode('utf-8')
+            
+            return {
+                "encrypted_data": reencrypted_b64,
+                "algorithm": "AES-256",
+                "timestamp": datetime.utcnow().isoformat()
+            }
+            
+        except Exception as e:
+            logger.error(f"Re-encryption failed: {str(e)}")
+            raise HTTPException(status_code=500, detail="Re-encryption failed")
 
 # Initialize encryption manager
 encryption_manager = EncryptionManager()
@@ -198,6 +276,38 @@ async def decrypt_data(request: DecryptionRequest):
         logger.error(f"Decryption request failed: {str(e)}")
         raise HTTPException(status_code=500, detail="Decryption request failed")
 
+@app.post("/re-encrypt")
+async def reencrypt_data(request: ReEncryptRequest):
+    """Re-encrypt data with a new key"""
+    try:
+        result = encryption_manager.reencrypt_data(
+            encrypted_data=request.encrypted_data,
+            old_key=None,  # Uses stored old key or current master key
+            new_key=None   # Uses current master key
+        )
+        
+        return {
+            "success": True,
+            "result": result
+        }
+        
+    except Exception as e:
+        logger.error(f"Re-encryption request failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Re-encryption request failed")
+
+@app.post("/clear-old-key")
+async def clear_old_key():
+    """Clear the old key after re-encryption is complete"""
+    try:
+        encryption_manager.clear_old_key()
+        return {
+            "success": True,
+            "message": "Old key cleared"
+        }
+    except Exception as e:
+        logger.error(f"Clear old key failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Clear old key failed")
+
 @app.post("/rotate-key")
 async def rotate_key(request: KeyRotationRequest):
     """Rotate encryption key"""
@@ -206,7 +316,8 @@ async def rotate_key(request: KeyRotationRequest):
         if not request.admin_token or request.admin_token != settings.ADMIN_TOKEN:
             raise HTTPException(status_code=401, detail="Unauthorized")
         
-        result = encryption_manager.rotate_key()
+        # Keep old key for re-encryption workflow
+        result = encryption_manager.rotate_key(keep_old_key=True)
         
         return {
             "success": True,

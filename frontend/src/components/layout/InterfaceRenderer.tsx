@@ -8,11 +8,12 @@
  * - Handles mobile vs desktop layouts
  */
 
-import React, { Suspense, useState, useEffect } from 'react';
+import React, { Suspense, useState, useEffect, useMemo } from 'react';
 import { UIConfig, ComponentConfig } from '../../types';
 import { ThemeProvider } from '../../theme/ThemeProvider';
 import { getComponent } from '../../registry/ComponentRegistry';
 import { getResponsiveLayoutClasses } from '../../theme/styles';
+import { prioritizeComponents, getRiskBasedLayout } from '../../utils/layoutPrioritizer';
 
 interface InterfaceRendererProps {
   config: UIConfig;
@@ -71,14 +72,36 @@ interface DesktopLayoutProps {
 }
 
 function DesktopLayout({ config, layoutClasses }: DesktopLayoutProps) {
-  const { layout, components } = config;
+  const { components, metadata } = config;
+  
+  // Prioritize components based on risk level and urgency
+  const prioritizedLayout = useMemo(() => {
+    return prioritizeComponents(config);
+  }, [config]);
+
+  // Get risk-based layout adjustments
+  const layoutAdjustments = useMemo(() => {
+    return getRiskBasedLayout(metadata.risk_level);
+  }, [metadata.risk_level]);
+
+  // Apply risk-based filtering
+  const hero = layoutAdjustments.compactMode 
+    ? prioritizedLayout.hero.slice(0, 1)
+    : prioritizedLayout.hero;
+  const primary = prioritizedLayout.primary.slice(0, layoutAdjustments.maxComponents);
+  const sidebar = layoutAdjustments.showSidebar 
+    ? prioritizedLayout.sidebar.slice(0, 3)
+    : [];
+  const footer = layoutAdjustments.showFooter 
+    ? prioritizedLayout.footer.slice(0, 2)
+    : [];
 
   return (
     <div className="space-y-8">
       {/* Hero section (full width) */}
-      {layout.hero.length > 0 && (
+      {hero.length > 0 && (
         <section className={layoutClasses.hero}>
-          {layout.hero.map(componentName => (
+          {hero.map(componentName => (
             <ComponentRenderer
               key={componentName}
               componentName={componentName}
@@ -91,9 +114,9 @@ function DesktopLayout({ config, layoutClasses }: DesktopLayoutProps) {
       {/* Primary + Sidebar (2-column) */}
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Primary section */}
-        {layout.primary.length > 0 && (
+        {primary.length > 0 && (
           <section className={layoutClasses.primary}>
-            {layout.primary.map(componentName => (
+            {primary.map(componentName => (
               <ComponentRenderer
                 key={componentName}
                 componentName={componentName}
@@ -104,9 +127,9 @@ function DesktopLayout({ config, layoutClasses }: DesktopLayoutProps) {
         )}
 
         {/* Sidebar section */}
-        {layout.sidebar.length > 0 && (
+        {sidebar.length > 0 && (
           <aside className={layoutClasses.sidebar}>
-            {layout.sidebar.map(componentName => (
+            {sidebar.map(componentName => (
               <ComponentRenderer
                 key={componentName}
                 componentName={componentName}
@@ -118,9 +141,9 @@ function DesktopLayout({ config, layoutClasses }: DesktopLayoutProps) {
       </div>
 
       {/* Footer section */}
-      {layout.footer.length > 0 && (
+      {footer.length > 0 && (
         <footer className={layoutClasses.footer}>
-          {layout.footer.map(componentName => (
+          {footer.map(componentName => (
             <ComponentRenderer
               key={componentName}
               componentName={componentName}
@@ -142,11 +165,19 @@ interface MobileLayoutProps {
 }
 
 function MobileLayout({ config }: MobileLayoutProps) {
-  const { mobile_layout, components } = config;
+  const { components, metadata } = config;
+  
+  // Prioritize components for mobile
+  const prioritizedLayout = useMemo(() => {
+    return prioritizeComponents(config);
+  }, [config]);
+
+  // Mobile layout uses prioritized order, limited to top 7 components
+  const mobileComponents = prioritizedLayout.mobile.slice(0, 7);
 
   return (
     <div className="space-y-4">
-      {mobile_layout.map(componentName => (
+      {mobileComponents.map(componentName => (
         <ComponentRenderer
           key={componentName}
           componentName={componentName}

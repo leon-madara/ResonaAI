@@ -77,6 +77,52 @@
   cursor: not-allowed;
 }
 
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  right: 0.75rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  pointer-events: none;
+}
+
+.valid-icon {
+  color: #10b981;
+}
+
+.error-icon {
+  color: #ef4444;
+}
+
+.form-input.valid {
+  border-color: #10b981;
+  padding-right: 2.5rem;
+}
+
+.form-input.error {
+  border-color: #ef4444;
+  padding-right: 2.5rem;
+}
+
+.form-input.error:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.error-message {
+  font-size: 0.875rem;
+  color: #ef4444;
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
 .password-strength {
   display: flex;
   align-items: center;
@@ -117,6 +163,10 @@
 
 .strength-3 {
   background: #10b981;
+}
+
+.strength-4 {
+  background: #059669;
 }
 
 .strength-label {
@@ -200,5 +250,114 @@
 .link:hover {
   color: #764ba2;
   text-decoration: underline;
+}
+
+.password-requirements {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+}
+
+.requirement {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #6b7280;
+  transition: color 0.2s;
+}
+
+.dark .requirement {
+  color: #9ca3af;
+}
+
+.requirement.met {
+  color: #10b981;
+}
+
+.requirement.met svg {
+  color: #10b981;
+}
+
+.requirement:not(.met) svg {
+  color: #ef4444;
+}
+
+.social-login {
+  margin-top: 1.5rem;
+}
+
+.social-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 1.5rem 0;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.social-divider::before,
+.social-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.dark .social-divider::before,
+.dark .social-divider::after {
+  border-bottom-color: #4b5563;
+}
+
+.social-divider span {
+  padding: 0 1rem;
+}
+
+.social-buttons {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.social-button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  background: white;
+  color: #374151;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dark .social-button {
+  background: #374151;
+  border-color: #4b5563;
+  color: #d1d5db;
+}
+
+.social-button:hover:not(:disabled) {
+  background: #f9fafb;
+  border-color: #9ca3af;
+  transform: translateY(-1px);
+}
+
+.dark .social-button:hover:not(:disabled) {
+  background: #4b5563;
+}
+
+.social-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.social-icon {
+  width: 1.25rem;
+  height: 1.25rem;
 }
 

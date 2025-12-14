@@ -1,0 +1,176 @@
+.emotion-timeline {
+  padding: 1.5rem;
+  border-radius: 12px;
+  background: var(--card-bg, #ffffff);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.emotion-timeline__header h3 {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-color, #111827);
+}
+
+.emotion-timeline__days {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.emotion-timeline__day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.emotion-timeline__day:hover {
+  background: #f3f4f6;
+  transform: translateY(-2px);
+}
+
+.emotion-timeline__day--dissonance {
+  border-color: #f59e0b;
+  background: #fef3c7;
+}
+
+.emotion-timeline__day-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+}
+
+.emotion-timeline__day-emoji {
+  font-size: 1.5rem;
+}
+
+.emotion-timeline__dissonance-indicator {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  font-size: 0.75rem;
+}
+
+.emotion-timeline__patterns,
+.emotion-timeline__coping {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.emotion-timeline__patterns h4,
+.emotion-timeline__coping h4 {
+  margin: 0 0 0.75rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-color, #111827);
+}
+
+.emotion-timeline__patterns ul,
+.emotion-timeline__coping ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.emotion-timeline__patterns li,
+.emotion-timeline__coping li {
+  padding: 0.5rem 0;
+  line-height: 1.6;
+  color: var(--text-color, #111827);
+}
+
+.emotion-timeline__coping-strategy {
+  font-weight: 500;
+}
+
+.emotion-timeline__coping-effectiveness {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-left: 0.5rem;
+}
+
+/* Sparkline style */
+.emotion-timeline--sparkline {
+  padding: 0.5rem;
+  height: 40px;
+  position: relative;
+}
+
+.emotion-timeline__sparkline {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.emotion-timeline__sparkline-dot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  top: 50%;
+}
+
+.emotion-timeline__sparkline-dot--happy {
+  background: #10b981;
+}
+
+.emotion-timeline__sparkline-dot--sad {
+  background: #3b82f6;
+}
+
+.emotion-timeline__sparkline-dot--anxious {
+  background: #f59e0b;
+}
+
+.emotion-timeline__sparkline-dot--angry {
+  background: #ef4444;
+}
+
+.emotion-timeline__sparkline-dot--neutral {
+  background: #6b7280;
+}
+
+/* Simple style */
+.emotion-timeline--simple {
+  padding: 1rem;
+}
+
+.emotion-timeline--simple .emotion-timeline__header h3 {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.emotion-timeline--simple .emotion-timeline__day {
+  padding: 0.5rem;
+}
+
+.emotion-timeline--simple .emotion-timeline__day-emoji {
+  font-size: 1.25rem;
+}
+
+@media (max-width: 768px) {
+  .emotion-timeline {
+    padding: 1rem;
+  }
+
+  .emotion-timeline__days {
+    gap: 0.25rem;
+  }
+
+  .emotion-timeline__day {
+    padding: 0.5rem;
+    min-width: 50px;
+  }
+}
+

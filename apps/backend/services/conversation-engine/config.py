@@ -32,6 +32,9 @@ class Settings(BaseSettings):
     )
     REDIS_URL: str = os.getenv("REDIS_URL", "redis://redis:6379")
 
+    # Encryption service (for encrypting message content at rest)
+    ENCRYPTION_SERVICE_URL: str = os.getenv("ENCRYPTION_SERVICE_URL", "http://encryption-service:8000")
+
     model_config = SettingsConfigDict(env_file=".env", case_sensitive=True)
 
 

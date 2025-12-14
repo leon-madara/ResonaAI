@@ -15,9 +15,14 @@ import jwt
 from datetime import datetime, timedelta
 
 # Add services to path
-services_path = os.path.join(os.path.dirname(__file__), '..', 'services', 'api-gateway')
+services_path = os.path.join(os.path.dirname(__file__), '..', 'apps', 'backend', 'gateway')
 if services_path not in sys.path:
     sys.path.insert(0, services_path)
+
+# Add repo root to path for shared `src.*` imports
+repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if repo_root not in sys.path:
+    sys.path.insert(0, repo_root)
 
 # Test database URL (use in-memory SQLite for tests)
 TEST_DATABASE_URL = "sqlite:///:memory:"
@@ -42,10 +47,17 @@ def test_engine():
 def test_db(test_engine) -> Generator[Session, None, None]:
     """Create test database session"""
     # Import here to avoid circular imports
-    # Note: api-gateway uses hyphen, so we import directly from the path
     import importlib.util
-    spec = importlib.util.spec_from_file_location("database", os.path.join(os.path.dirname(__file__), '..', 'services', 'api-gateway', 'database.py'))
+    # Clear potentially-colliding top-level modules from other service tests.
+    for mod_name in list(sys.modules.keys()):
+        if mod_name == "models" or mod_name.startswith("models."):
+            del sys.modules[mod_name]
+        if mod_name == "repositories" or mod_name.startswith("repositories."):
+            del sys.modules[mod_name]
+    spec = importlib.util.spec_from_file_location("database", os.path.join(os.path.dirname(__file__), '..', 'apps', 'backend', 'gateway', 'database.py'))
     database_module = importlib.util.module_from_spec(spec)
+    # Ensure imports like `from database import Base` resolve to this in-memory module.
+    sys.modules["database"] = database_module
     spec.loader.exec_module(database_module)
     Base = database_module.Base
     
@@ -71,14 +83,16 @@ def test_user(test_db):
     import uuid
     
     # Import database module
-    db_spec = importlib.util.spec_from_file_location("database", os.path.join(os.path.dirname(__file__), '..', 'services', 'api-gateway', 'database.py'))
+    db_spec = importlib.util.spec_from_file_location("database", os.path.join(os.path.dirname(__file__), '..', 'apps', 'backend', 'gateway', 'database.py'))
     db_module = importlib.util.module_from_spec(db_spec)
+    sys.modules["database"] = db_module
     db_spec.loader.exec_module(db_module)
     User = db_module.User
     
     # Import auth_service
-    auth_spec = importlib.util.spec_from_file_location("auth_service", os.path.join(os.path.dirname(__file__), '..', 'services', 'api-gateway', 'auth_service.py'))
+    auth_spec = importlib.util.spec_from_file_location("auth_service", os.path.join(os.path.dirname(__file__), '..', 'apps', 'backend', 'gateway', 'auth_service.py'))
     auth_module = importlib.util.module_from_spec(auth_spec)
+    sys.modules["auth_service"] = auth_module
     auth_spec.loader.exec_module(auth_module)
     get_password_hash = auth_module.get_password_hash
     
@@ -121,7 +135,7 @@ def api_gateway_client():
         "REDIS_PORT": "6379",
     }):
         # Import main module
-        main_spec = importlib.util.spec_from_file_location("main", os.path.join(os.path.dirname(__file__), '..', 'services', 'api-gateway', 'main.py'))
+        main_spec = importlib.util.spec_from_file_location("main", os.path.join(os.path.dirname(__file__), '..', 'apps', 'backend', 'gateway', 'main.py'))
         main_module = importlib.util.module_from_spec(main_spec)
         main_spec.loader.exec_module(main_module)
         return TestClient(main_module.app)

@@ -1,14 +1,16 @@
 [run]
-source = services,src
+source = apps/backend
 omit = 
     */tests/*
     */test_*.py
     */__pycache__/*
     */venv/*
-    */.venv/*
-    */node_modules/*
+    */env/*
     */migrations/*
     */alembic/*
+    */node_modules/*
+    */build/*
+    */dist/*
 
 [report]
 exclude_lines =
@@ -19,6 +21,7 @@ exclude_lines =
     if __name__ == .__main__.:
     if TYPE_CHECKING:
     @abstractmethod
+    @abc.abstractmethod
     class .*\bProtocol\):
     @(abc\.)?abstractmethod
 
@@ -28,4 +31,3 @@ skip_covered = False
 
 [html]
 directory = htmlcov
-

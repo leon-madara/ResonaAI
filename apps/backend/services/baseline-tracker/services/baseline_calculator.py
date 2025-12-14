@@ -5,7 +5,7 @@ Calculates emotional and voice baselines for users
 
 import logging
 from typing import Dict, List, Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from collections import Counter
 import statistics
 
@@ -127,7 +127,7 @@ class BaselineCalculator:
         window_days: int
     ) -> List[Dict]:
         """Filter data to recent window"""
-        cutoff_date = datetime.utcnow() - timedelta(days=window_days)
+        cutoff_date = datetime.now(timezone.utc) - timedelta(days=window_days)
         
         filtered = []
         for record in data:

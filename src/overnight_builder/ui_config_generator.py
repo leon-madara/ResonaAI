@@ -8,13 +8,8 @@ Orchestrates theme selection, component visibility, and layout prioritization.
 from typing import Dict, List, Optional
 from dataclasses import dataclass, asdict
 from datetime import datetime
-import sys
-import os
 
-# Add parent directory to path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from pattern_analysis.pattern_aggregator import AggregatedPatterns
+from src.pattern_analysis.pattern_aggregator import AggregatedPatterns
 from .theme_selector import ThemeSelector, ThemeConfig
 from .component_visibility import ComponentVisibilityEngine, ComponentConfig
 from .layout_prioritizer import LayoutPrioritizer

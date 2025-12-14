@@ -6,6 +6,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { OfflineProvider } from './contexts/OfflineContext';
 import { EmotionProvider } from './contexts/EmotionContext';
+import AdaptiveThemeUpdater from './components/Theme/AdaptiveThemeUpdater';
 import Layout from './components/Layout/Layout';
 import HomePage from './pages/HomePage';
 import ChatPage from './pages/ChatPage';
@@ -40,6 +41,7 @@ function App() {
           <OfflineProvider>
             <AuthProvider>
               <EmotionProvider>
+                <AdaptiveThemeUpdater />
                 <Router>
                   <div className="App">
                     <Routes>
