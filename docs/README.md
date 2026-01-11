@@ -1,92 +1,127 @@
-# ResonaAI Documentation
+# ResonaAI Documentation Hub
 
-Central documentation hub for the ResonaAI platform.
+**Welcome to the ResonaAI documentation center** - your single source of truth for all project information.
 
-## 📚 Documentation Index
+---
 
-### Getting Started
-- [Quick Start Guide](guides/QUICK_START_GUIDE.md) - Get up and running quickly
-- [Executive Summary](guides/EXECUTIVE_SUMMARY.md) - Project overview for stakeholders
-- [Implementation Status](guides/IMPLEMENTATION_COMPLETE.md) - Current implementation state
+## 🚀 Quick Navigation
 
-### Architecture
-- [System Design](architecture/system-design.md) - High-level architecture overview
-- [Architecture Overview](architecture/ARCHITECTURE.md) - Component architecture
-- [Quick Reference](architecture/QUICK_REFERENCE.md) - Architecture cheat sheet
-- [Implementation Status](architecture/implementation-status-analysis.md) - Gap analysis
-- [Project Rules & Status](architecture/PROJECT_RULES_AND_STATUS.md) - Standards mapping
-- [Adaptive Interface Concept](architecture/ADAPTIVE_INTERFACE_CONCEPT.md) - UI personalization
-- [Design Critique](architecture/DESIGN_CRITIQUE_AND_IMPROVEMENTS.md) - Improvements roadmap
+### 📊 Project Status
+**Current status, roadmap, and progress tracking**
+- [Current Status](project-status/current-status.md) - Overall project completion (75%)
+- [Critical Path](project-status/critical-path.md) - 4-6 weeks to production
+- [Active Backlog](project-status/backlog.md) - Current priorities
+- [Completed Features](project-status/completed.md) - Achievement log
 
-### API Documentation
-- [API Reference](api/API.md) - Complete API documentation
+### 🏗️ Architecture
+**Technical system design and specifications**
+- [System Overview](architecture/system-overview.md) - High-level architecture
+- [Microservices](architecture/microservices.md) - Service architecture
+- [Database Schema](architecture/database-schema.md) - Data design
+- [Pattern Analysis](architecture/pattern-analysis.md) - AI/ML architecture
+- [Security Architecture](architecture/security-architecture.md) - Security design
 
-### Security & Compliance
-- [TLS Configuration](security/tls-configuration.md) - Transport security setup
-- [Kenya DPA Compliance](compliance/Kenya-DPA-Compliance.md) - Data protection compliance
-- [DPIA](compliance/DPIA.md) - Data Protection Impact Assessment
+### 🎨 Frontend
+**User interface and experience documentation**
+- [Frontend Architecture](frontend/architecture.md) - React app structure
+- [Design System](frontend/design-system.md) - UI/UX specifications
+- [Component Library](frontend/components.md) - Reusable components
+- [Testing Guide](frontend/testing.md) - Frontend testing
 
-### Operations
-- [Deployment Checklist](runbooks/deployment-checklist.md) - Pre-deployment verification
-- [Disaster Recovery](runbooks/disaster-recovery.md) - DR procedures
-- [Docker Smoke Test](runbooks/docker-compose-smoke-test.md) - Container testing
-- [Monitoring & Alerts](runbooks/monitoring-alerts-guide.md) - Observability guide
-- [Rollback Procedures](runbooks/rollback-procedures.md) - Reverting deployments
-- [Scaling Guide](runbooks/scaling-guide.md) - Horizontal/vertical scaling
+### 👨‍💻 Development
+**Developer guides and procedures**
+- [Getting Started](development/getting-started.md) - Quick start guide
+- [Setup Guide](development/setup-guide.md) - Environment setup
+- [Testing Guide](development/testing-guide.md) - Testing procedures
+- [Deployment Guide](development/deployment-guide.md) - Deployment procedures
+- [Troubleshooting](development/troubleshooting.md) - Common issues
 
-## 🗂️ Directory Structure
+### 📡 API Reference
+**Complete API documentation**
+- [API Overview](api/overview.md) - API introduction
+- [Authentication](api/authentication.md) - Auth endpoints
+- [Services](api/services/) - Service-specific APIs
+- [Examples](api/examples.md) - Usage examples
 
-```
-docs/
-├── README.md              # This file
-├── architecture/          # System architecture docs
-│   ├── system-design.md
-│   ├── ARCHITECTURE.md
-│   ├── QUICK_REFERENCE.md
-│   ├── implementation-status-analysis.md
-│   ├── PROJECT_RULES_AND_STATUS.md
-│   ├── ADAPTIVE_INTERFACE_CONCEPT.md
-│   ├── DESIGN_CRITIQUE_AND_IMPROVEMENTS.md
-│   └── decisions/         # Architecture Decision Records
-├── api/                   # API documentation
-│   └── API.md
-├── guides/                # How-to guides
-│   ├── QUICK_START_GUIDE.md
-│   ├── EXECUTIVE_SUMMARY.md
-│   └── IMPLEMENTATION_COMPLETE.md
-├── security/              # Security documentation
-│   └── tls-configuration.md
-├── compliance/            # Compliance documentation
-│   ├── DPIA.md
-│   └── Kenya-DPA-Compliance.md
-└── runbooks/              # Operational runbooks
-    ├── deployment-checklist.md
-    ├── disaster-recovery.md
-    ├── docker-compose-smoke-test.md
-    ├── monitoring-alerts-guide.md
-    ├── rollback-procedures.md
-    └── scaling-guide.md
-```
+### 📚 Archive
+**Historical documents and reports**
+- [Progress Reports](archive/progress-reports/) - Historical progress
+- [Completed Features](archive/completed-features/) - Feature history
+- [Deprecated Docs](archive/deprecated/) - Outdated documentation
 
-## 🔗 Quick Links
+---
 
-### For Developers
-1. [Quick Start Guide](guides/QUICK_START_GUIDE.md) - Setup instructions
-2. [System Design](architecture/system-design.md) - Architecture overview
-3. [API Reference](api/API.md) - Endpoint documentation
+## 🎯 Documentation Principles
 
-### For DevOps
-1. [Deployment Checklist](runbooks/deployment-checklist.md)
-2. [Scaling Guide](runbooks/scaling-guide.md)
-3. [Monitoring Guide](runbooks/monitoring-alerts-guide.md)
+### Single Source of Truth
+All project information is centralized here. If you find documentation elsewhere, it should reference back to this hub.
 
-### For Stakeholders
-1. [Executive Summary](guides/EXECUTIVE_SUMMARY.md)
-2. [Implementation Status](guides/IMPLEMENTATION_COMPLETE.md)
+### Progressive Disclosure
+- **Start with overviews** for high-level understanding
+- **Drill down to specifics** as needed
+- **Cross-reference related topics** for context
 
-## ✏️ Contributing to Documentation
+### Always Current
+- Documentation is updated with code changes
+- Status reflects real project state
+- Deprecated information is archived, not deleted
 
-1. **Find the right section** - Use the structure above
-2. **Follow existing formats** - Maintain consistent styling
-3. **Keep it current** - Update docs when code changes
-4. **Link appropriately** - Cross-reference related docs
+---
+
+## 🔍 Finding Information
+
+### By Role
+- **Project Manager**: Start with [Project Status](project-status/)
+- **Developer**: Start with [Development](development/) guides
+- **Architect**: Start with [Architecture](architecture/) docs
+- **Designer**: Start with [Frontend](frontend/) documentation
+- **QA**: Start with [Testing Guides](development/testing-guide.md)
+
+### By Task
+- **Understanding the system**: [System Overview](architecture/system-overview.md)
+- **Setting up development**: [Setup Guide](development/setup-guide.md)
+- **Checking project status**: [Current Status](project-status/current-status.md)
+- **Using the API**: [API Overview](api/overview.md)
+- **Deploying the system**: [Deployment Guide](development/deployment-guide.md)
+
+### By Component
+- **Voice Processing**: [Pattern Analysis](architecture/pattern-analysis.md)
+- **User Interface**: [Design System](frontend/design-system.md)
+- **Database**: [Database Schema](architecture/database-schema.md)
+- **Security**: [Security Architecture](architecture/security-architecture.md)
+
+---
+
+## 📝 Contributing to Documentation
+
+### Adding New Documentation
+1. Choose the appropriate section
+2. Follow the naming conventions
+3. Update the relevant README navigation
+4. Cross-reference related documents
+
+### Updating Existing Documentation
+1. Keep the existing structure
+2. Update cross-references if needed
+3. Archive outdated information instead of deleting
+
+### Documentation Standards
+- Use clear, descriptive headings
+- Include navigation links
+- Provide context and examples
+- Keep language professional but accessible
+
+---
+
+## 🔗 External Resources
+
+- **GitHub Repository**: [ResonaAI](https://github.com/leon-madara/ResonaAI)
+- **Live Documentation**: This documentation hub
+- **Issue Tracking**: GitHub Issues
+- **Project Board**: GitHub Projects
+
+---
+
+**Last Updated**: January 11, 2025  
+**Maintained By**: ResonaAI Development Team  
+**Questions?**: Check [Troubleshooting](development/troubleshooting.md) or create an issue
