@@ -256,12 +256,15 @@ class DeflectionDetector:
         base_score = 0.0
         
         # Count deflections by severity
-        severity_counts = {"low": 0, "medium": 0, "high": 0}
+        severity_counts = {"low": 0, "medium": 0, "high": 0, "critical": 0}
         for deflection in deflections:
             severity = deflection.severity
             severity_counts[severity] = severity_counts.get(severity, 0) + 1
             
-            if severity == "high":
+            if severity == "critical":
+                base_score += 1.0  # Critical patterns immediately trigger high risk
+                risk_factors.append(f"CRITICAL: {deflection.pattern} - {deflection.cultural_meaning}")
+            elif severity == "high":
                 base_score += 0.3
                 risk_factors.append(f"High-severity deflection: {deflection.pattern}")
             elif severity == "medium":
@@ -279,8 +282,10 @@ class DeflectionDetector:
         
         final_score = min(1.0, base_score * contradiction_multiplier)
         
-        # Determine risk level
-        if final_score >= 0.7:
+        # Determine risk level - critical patterns always trigger critical/high risk
+        if severity_counts.get("critical", 0) > 0:
+            risk_level = "critical"
+        elif final_score >= 0.7:
             risk_level = "high"
         elif final_score >= 0.4:
             risk_level = "medium"
@@ -393,7 +398,14 @@ class DeflectionDetector:
                                      contradictions: List[VoiceContradiction],
                                      deflections: List[DeflectionMatch]) -> str:
         """Generate risk interpretation"""
-        if risk_level == "high":
+        if risk_level == "critical":
+            return (
+                f"CRITICAL RISK: {severity_counts.get('critical', 0)} critical patterns detected "
+                f"(suicide ideation, severe hopelessness). "
+                "IMMEDIATE CRISIS INTERVENTION REQUIRED. Assess safety, provide crisis resources, "
+                "do not leave user alone."
+            )
+        elif risk_level == "high":
             return (
                 f"High risk detected: {severity_counts.get('high', 0)} high-severity deflections, "
                 f"{len(contradictions)} voice contradictions. "
@@ -418,7 +430,9 @@ class DeflectionDetector:
         """Get recommended action based on analysis"""
         risk_level = risk_assessment.get("risk_level", "low")
         
-        if risk_level == "high":
+        if risk_level == "critical":
+            return "CRISIS INTERVENTION: Assess immediate safety. Ask about suicide plan and means. Provide crisis hotline. Do not leave user alone."
+        elif risk_level == "high":
             return "Immediate gentle probing recommended. Acknowledge contradictions and offer safe space."
         elif risk_level == "medium":
             return "Patient, gentle approach. Don't push, but offer opportunities to open up."

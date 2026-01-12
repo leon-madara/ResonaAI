@@ -17,6 +17,7 @@ import RegisterPage from './pages/RegisterPage';
 import ConsentPage from './pages/ConsentPage';
 import CrisisPage from './pages/CrisisPage';
 import OfflinePage from './pages/OfflinePage';
+import UITestPage from './pages/UITestPage';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
 import LoadingSpinner from './components/UI/LoadingSpinner';
 import ErrorBoundary from './components/UI/ErrorBoundary';
@@ -51,6 +52,7 @@ function App() {
                       <Route path="/consent" element={<ConsentPage />} />
                       <Route path="/crisis" element={<CrisisPage />} />
                       <Route path="/offline" element={<OfflinePage />} />
+                      <Route path="/ui-test" element={<UITestPage />} />
                       
                       {/* Protected routes */}
                       <Route

@@ -82,7 +82,7 @@ class ComponentVisibilityEngine:
 
         # Determine prompt based on patterns
         if patterns.cultural_context.primary_language == 'swahili':
-            if patterns.cultural_context.code_switching:
+            if patterns.cultural_context.code_switching_detected:
                 prompt = "Niambie hali yako halisi? (Tell me how you're really doing?)"
             else:
                 prompt = "Habari yako? Niambie kitu..."
@@ -113,7 +113,7 @@ class ComponentVisibilityEngine:
         """CulturalGreeting: Always visible, personalized"""
 
         # Determine language
-        language = 'mixed' if patterns.cultural_context.code_switching else patterns.cultural_context.primary_language
+        language = 'mixed' if patterns.cultural_context.code_switching_detected else patterns.cultural_context.primary_language
 
         # Personalization based on trajectory
         if patterns.emotional_patterns.trajectory == 'declining':
@@ -140,7 +140,7 @@ class ComponentVisibilityEngine:
     def _dissonance_indicator_config(self, patterns: AggregatedPatterns) -> Optional[ComponentConfig]:
         """DissonanceIndicator: Show if high dissonance detected"""
 
-        dissonance_score = patterns.current_dissonance.dissonance_score
+        dissonance_score = patterns.current_dissonance.dissonance_score if patterns.current_dissonance else 0.0
 
         # Only show if dissonance is significant
         if dissonance_score < 0.6:
@@ -171,7 +171,7 @@ class ComponentVisibilityEngine:
         risk_level = patterns.current_risk.risk_level
 
         # Only show for medium+ risk
-        if risk_level == 'low':
+        if risk_level in ('low', 'unknown'):
             return None
 
         # Prominence based on risk
@@ -190,8 +190,8 @@ class ComponentVisibilityEngine:
         return ComponentConfig(
             component_name='CrisisResources',
             visible=True,
-            prominence=prominence_map[risk_level],
-            urgency=urgency_map[risk_level],
+            prominence=prominence_map.get(risk_level, 'sidebar'),
+            urgency=urgency_map.get(risk_level, 'medium'),
             props={
                 'risk_level': risk_level,
                 'resources': self._get_crisis_resources(patterns),

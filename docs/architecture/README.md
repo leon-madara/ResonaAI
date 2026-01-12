@@ -27,6 +27,13 @@ ResonaAI is built as a **microservices architecture** with 15 specialized servic
 - Scalability and performance design
 - Technology stack overview
 
+### [Project Structure](project-structure.md)
+**Complete directory organization and navigation guide**
+- Comprehensive project directory overview
+- Key principles and separation of concerns
+- Statistics and quick navigation
+- Development, documentation, and operations paths
+
 ### [Microservices Architecture](microservices.md)
 **Detailed microservices design and implementation**
 - 15 microservices breakdown

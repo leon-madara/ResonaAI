@@ -1,5 +1,9 @@
 # ResonaAI Project Structure
 
+> **📍 This document has been moved to the centralized documentation hub**  
+> **New Location**: [`docs/architecture/project-structure.md`](docs/architecture/project-structure.md)  
+> **Please update your bookmarks and references**
+
 This document provides a comprehensive overview of the project organization.
 
 ## 🏗️ Directory Overview

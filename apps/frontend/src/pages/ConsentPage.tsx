@@ -158,10 +158,7 @@ const ConsentPage: React.FC = () => {
           granted: true,
         });
       } else {
-        await revokeConsent(token, {
-          consent_type: consentId,
-          consent_version: consent.version,
-        });
+        await revokeConsent(token, consentId);
       }
 
       // Reload consents to get updated data
@@ -253,10 +250,14 @@ const ConsentPage: React.FC = () => {
           </h2>
           <div className="history-timeline">
             {consentHistory
-              .sort((a, b) => new Date(b.granted_at).getTime() - new Date(a.granted_at).getTime())
+              .sort((a, b) => {
+                const aTime = a.granted_at ? new Date(a.granted_at).getTime() : 0;
+                const bTime = b.granted_at ? new Date(b.granted_at).getTime() : 0;
+                return bTime - aTime;
+              })
               .slice(0, 10)
               .map((record) => (
-                <div key={record.id} className="history-item">
+                <div key={record.consent_id} className="history-item">
                   <div className="history-dot" />
                   <div className="history-content">
                     <div className="history-header">
@@ -276,11 +277,13 @@ const ConsentPage: React.FC = () => {
                       </span>
                     </div>
                     <p className="history-date">
-                      {record.granted
+                      {record.granted && record.granted_at
                         ? `Granted: ${new Date(record.granted_at).toLocaleString()}`
                         : record.revoked_at
                         ? `Revoked: ${new Date(record.revoked_at).toLocaleString()}`
-                        : `Updated: ${new Date(record.granted_at).toLocaleString()}`}
+                        : record.granted_at
+                        ? `Updated: ${new Date(record.granted_at).toLocaleString()}`
+                        : 'Date unknown'}
                     </p>
                     <p className="history-version">Version: {record.consent_version}</p>
                   </div>

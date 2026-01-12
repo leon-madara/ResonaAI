@@ -109,7 +109,14 @@ progress-reports/
 │   └── 25-12-13-High-Priority-Backlog-Completion.md
 │
 ├── 2025-01/
-│   └── 25-01-11-Project-Status-Update.md
+│   ├── 25-01-11-Project-Status-Update.md
+│   ├── 25-01-15-Authentication-Tests-Completion.md
+│   ├── 25-01-15-Database-Connections-Completion.md
+│   ├── 25-01-15-Encrypted-Storage-Integration-Completion.md
+│   ├── 25-01-15-Layout-System-Tests-Completion.md
+│   ├── 25-01-15-Task-4.6-UIConfig-Integration-Tests-Completion.md
+│   ├── 25-01-15-Theme-System-Tests-Completion.md
+│   └── 25-01-XX-Encryption-Service-Batch-Endpoints-Completion.md
 │
 └── special-reports/
     ├── COMPREHENSIVE_STATUS_REPORT.md

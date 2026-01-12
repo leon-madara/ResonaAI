@@ -44,7 +44,7 @@ ResonaAI/
 └── monitoring/              # Observability stack
 ```
 
-See [STRUCTURE.md](STRUCTURE.md) for detailed project organization.
+See [docs/architecture/project-structure.md](docs/architecture/project-structure.md) for detailed project organization.
 
 ## 🏗️ Architecture
 
@@ -159,10 +159,12 @@ make docker-up     # Start Docker containers
 
 | Document | Description |
 |----------|-------------|
-| [Quick Start Guide](docs/guides/QUICK_START_GUIDE.md) | Get started quickly |
-| [System Design](docs/architecture/system-design.md) | Architecture overview |
-| [API Reference](docs/api/API.md) | Complete API docs |
-| [Deployment Guide](docs/runbooks/deployment-checklist.md) | Deploy to production |
+| [Documentation Hub](docs/README.md) | Central documentation navigation |
+| [Quick Start Guide](docs/development/getting-started.md) | Get started quickly |
+| [System Architecture](docs/architecture/system-overview.md) | Architecture overview |
+| [API Reference](docs/api/README.md) | Complete API docs |
+| [Project Status](docs/project-status/current-status.md) | Current completion status |
+| [Deployment Guide](docs/development/deployment-guide.md) | Deploy to production |
 
 ## 🧪 Testing
 
@@ -203,6 +205,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 **Built with ❤️ for East African communities**
 
-[⭐ Star us on GitHub](https://github.com/leon-madara/ResonaAI) | [📖 Documentation](docs/) | [🐛 Report Bug](https://github.com/leon-madara/ResonaAI/issues)
+[⭐ Star us on GitHub](https://github.com/leon-madara/ResonaAI) | [📖 Documentation](docs/README.md) | [🐛 Report Bug](https://github.com/leon-madara/ResonaAI/issues)
 
 </div>

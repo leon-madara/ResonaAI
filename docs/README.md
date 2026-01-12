@@ -54,7 +54,7 @@
 ## 🎯 Documentation Principles
 
 ### Single Source of Truth
-All project information is centralized here. If you find documentation elsewhere, it should reference back to this hub.
+All project information is centralized here. Root-level documentation files have been moved to appropriate sections with redirect notices for easy navigation.
 
 ### Progressive Disclosure
 - **Start with overviews** for high-level understanding

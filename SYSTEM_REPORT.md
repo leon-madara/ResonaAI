@@ -1,5 +1,9 @@
 # ResonaAI System Report
 
+> **📍 This document has been moved to the centralized documentation hub**  
+> **New Location**: [`docs/project-status/system-report.md`](docs/project-status/system-report.md)  
+> **Please update your bookmarks and references**
+
 **Generated**: January 2025  
 **Project Status**: Active Development - Phase 2 (Core Innovation)  
 **Overall Completion**: ~75% Complete

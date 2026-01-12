@@ -202,11 +202,15 @@ class OvernightBuilder:
             }
 
         except Exception as e:
+            import traceback
+            error_trace = traceback.format_exc()
             logger.error(f"Failed to build interface for user {user_id}: {e}")
+            logger.error(f"Full traceback:\n{error_trace}")
             return {
                 'status': 'failed',
                 'user_id': user_id,
-                'error': str(e)
+                'error': str(e),
+                'traceback': error_trace
             }
 
     async def get_users_for_build(
@@ -315,26 +319,119 @@ class OvernightBuilder:
 
         # This would use PatternAggregator.from_dict() method
         # For now, placeholder - assumes the dict structure matches AggregatedPatterns
-        from src.pattern_analysis.pattern_aggregator import (
-            EmotionalPattern,
-            DissonanceResult,
-            CulturalContext,
-            TriggerProfile,
-            CopingProfile,
-            BaselineProfile,
-            RiskAssessment,
-            MentalHealthProfile
-        )
+        from src.pattern_analysis.emotional_pattern_analyzer import EmotionalPattern
+        from src.pattern_analysis.dissonance_detector import DissonanceResult
+        from src.pattern_analysis.cultural_context_analyzer import CulturalContext
+        from src.pattern_analysis.trigger_detector import TriggerPattern
+        from src.pattern_analysis.coping_effectiveness_tracker import CopingProfile
+        from src.pattern_analysis.baseline_tracker import VoiceBaseline
+        from src.pattern_analysis.risk_assessment_engine import RiskAssessment
+        from src.pattern_analysis.mental_health_profiler import MentalHealthProfile
 
         # Reconstruct AggregatedPatterns from dict
-        # This is a simplified version - real implementation would be more robust
+        # Map cultural_context fields properly
+        cultural_dict = patterns_dict.get('cultural_context', {})
+        cultural_context = CulturalContext(
+            primary_language=cultural_dict.get('primary_language', 'english'),
+            code_switching_detected=cultural_dict.get('code_switching', False),
+            code_switching_pattern=cultural_dict.get('code_switching_pattern'),
+            deflection_phrases_used=cultural_dict.get('deflection_phrases', []),
+            deflection_frequency=cultural_dict.get('deflection_frequency', 0.0),
+            stoicism_level=cultural_dict.get('stoicism_level', 'medium'),
+            stoicism_markers=[],
+            cultural_stressors=cultural_dict.get('cultural_stressors', []),
+            recommended_approach=cultural_dict.get('communication_style', 'balanced')
+        )
+        
+        # Map coping profile fields
+        coping_dict = patterns_dict.get('coping', {})
+        coping_profile = CopingProfile(
+            effective_strategies=coping_dict.get('effective_strategies', {}),
+            ineffective_strategies=coping_dict.get('ineffective_strategies', {}),
+            untried_suggestions=coping_dict.get('untried_suggestions', []),
+            coping_consistency=coping_dict.get('coping_consistency', 0.5),
+            primary_coping_style=coping_dict.get('primary_coping_style', 'unknown')
+        )
+        
+        # Map current risk from current_state
+        current_state = patterns_dict.get('current_state', {})
+        current_risk = RiskAssessment(
+            risk_level=current_state.get('risk_level', 'unknown'),
+            risk_score=current_state.get('risk_score', 0.0),
+            risk_factors=current_state.get('risk_factors', []),
+            protective_factors=[],
+            trajectory='stable',
+            recommended_action='monitor',
+            alert_counselor=False
+        )
+        
+        # Map emotional patterns
+        emotional_dict = patterns_dict.get('emotional_patterns', {})
+        emotional_patterns = EmotionalPattern(
+            primary_emotions=emotional_dict.get('primary_emotions', []),
+            emotion_distribution=emotional_dict.get('emotion_distribution', {}),
+            temporal_patterns=emotional_dict.get('temporal_patterns', {}),
+            trajectory=emotional_dict.get('trajectory', 'insufficient_data'),
+            trajectory_confidence=emotional_dict.get('trajectory_confidence', 0.0),
+            variability_score=emotional_dict.get('variability_score', 0.5),
+            recent_shift=emotional_dict.get('recent_shift')
+        )
+        
+        # Map mental health profile
+        mh_dict = patterns_dict.get('mental_health_profile', {})
+        mental_health_profile = MentalHealthProfile(
+            user_id=patterns_dict.get('user_id'),
+            primary_concerns=mh_dict.get('primary_concerns', []),
+            secondary_concerns=[],
+            current_state=mh_dict.get('current_state', 'unknown'),
+            current_risk='low',
+            support_needs=mh_dict.get('support_needs', []),
+            communication_style='balanced',
+            effective_coping=[],
+            ineffective_patterns=[],
+            identified_strengths=mh_dict.get('identified_strengths', []),
+            identified_challenges=mh_dict.get('identified_challenges', [])
+        )
+        
+        # Map trigger pattern
+        trigger_dict = patterns_dict.get('triggers', {})
+        if isinstance(trigger_dict, dict) and 'triggers' in trigger_dict:
+            # Already has the right structure
+            trigger_pattern = TriggerPattern(**trigger_dict)
+        else:
+            # Need to extract from the JSON structure
+            trigger_pattern = TriggerPattern(
+                triggers=trigger_dict.get('triggers', []),
+                trigger_count=trigger_dict.get('trigger_count', 0),
+                most_severe_trigger=trigger_dict.get('most_severe_trigger'),
+                trigger_combinations=trigger_dict.get('trigger_combinations', [])
+            )
+        
         return AggregatedPatterns(
-            emotional_patterns=EmotionalPattern(**patterns_dict.get('emotional_patterns', {})),
-            current_dissonance=DissonanceResult(**patterns_dict.get('current_dissonance', {})),
-            cultural_context=CulturalContext(**patterns_dict.get('cultural_context', {})),
-            triggers=TriggerProfile(**patterns_dict.get('triggers', {})),
-            coping_profile=CopingProfile(**patterns_dict.get('coping_profile', {})),
-            baseline=BaselineProfile(**patterns_dict.get('baseline', {})),
-            current_risk=RiskAssessment(**patterns_dict.get('current_risk', {})),
-            mental_health_profile=MentalHealthProfile(**patterns_dict.get('mental_health_profile', {}))
+            emotional_patterns=emotional_patterns,
+            current_dissonance=DissonanceResult(**patterns_dict.get('current_dissonance', {})) if patterns_dict.get('current_dissonance') else None,
+            cultural_context=cultural_context,
+            triggers=trigger_pattern,
+            coping_profile=coping_profile,
+            voice_baseline=VoiceBaseline(
+                user_id=patterns_dict.get('user_id'),
+                sessions_analyzed=patterns_dict.get('sessions_analyzed', 0),
+                baseline_established=True,
+                typical_pitch_mean=150.0,
+                typical_pitch_std=20.0,
+                typical_pitch_range=100.0,
+                typical_energy_mean=0.5,
+                typical_energy_std=0.1,
+                typical_speech_rate=3.0,
+                typical_pause_ratio=0.2,
+                typical_prosody_variance=0.5,
+                typical_emotion_distribution={'neutral': 0.5, 'happy': 0.3, 'sad': 0.2},
+                stress_markers={}
+            ),
+            current_risk=current_risk,
+            mental_health_profile=mental_health_profile,
+            user_id=patterns_dict.get('user_id'),
+            generated_at=patterns_dict.get('generated_at'),
+            sessions_analyzed=patterns_dict.get('sessions_analyzed', 0),
+            data_confidence=patterns_dict.get('data_confidence', 0.0)
         )

@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from contextlib import asynccontextmanager
 from sqlalchemy.orm import Session
+from pydantic import BaseModel
 import logging
 from datetime import datetime, timezone
 import os
@@ -115,9 +116,9 @@ def _detect_deflection(text: str, language: str) -> Dict[str, Any]:
         detector = get_deflection_detector()
         result = detector.analyze(text, language=language)
         # Normalize keys so downstream code can safely access `patterns`.
-        # - Detector implementations vary; some return `matches` instead.
+        # - Detector implementations vary; some return `deflections` or `matches` instead.
         if "patterns" not in result:
-            result["patterns"] = result.get("matches", []) or []
+            result["patterns"] = result.get("deflections", result.get("matches", [])) or []
         return result
     except Exception as e:
         logger.warning(f"Deflection detector failed, using fallback: {e}")
@@ -433,7 +434,7 @@ async def get_cultural_context(
     
     # Add deflection context if detected
     if deflection_info["deflection_detected"]:
-        deflection_meanings = [p["meaning"] for p in deflection_info["patterns"]]
+        deflection_meanings = [p.get("cultural_meaning", p.get("meaning", "")) for p in deflection_info["patterns"]]
         context_lines.append(
             f"Deflection patterns detected: {', '.join(deflection_meanings)}. "
             "The user may not be ready to discuss their feelings directly. Be patient and offer gentle follow-up."
@@ -443,11 +444,14 @@ async def get_cultural_context(
     full_context = "\n".join(context_lines) + (("\n\n" + retrieval_text) if retrieval_text else "")
 
     payload = {
+        "cultural_context": [{"id": e.get("id"), "content": e.get("content", ""), "keywords": e.get("keywords", [])} for e in retrieved],
         "context": full_context,
         "language": language,
         "query": q,
         "source": "local_kb_retrieval" if retrieved else "mvp_fallback",
         "matches": [{"id": e.get("id"), "keywords": e.get("keywords")} for e in retrieved],
+        "deflection_analysis": deflection_info,
+        "code_switching_analysis": code_switching_info,
         "code_switching": code_switching_info,
         "deflection": deflection_info,
         "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -566,6 +570,189 @@ async def index_knowledge_base_endpoint(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to index knowledge base: {str(e)}"
+        )
+
+
+# Add request models
+class CulturalAnalysisRequest(BaseModel):
+    text: str
+    language: str = "en"
+    emotion: Optional[str] = None
+    voice_features: Optional[Dict[str, Any]] = None
+
+@app.post("/cultural-analysis")
+async def analyze_cultural_patterns(
+    request: CulturalAnalysisRequest,
+    db: Session = Depends(get_db),
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """
+    Comprehensive cultural pattern analysis for conversation engine integration.
+    
+    This endpoint provides deep cultural analysis including:
+    - Deflection pattern detection
+    - Code-switching analysis  
+    - Cultural context retrieval
+    - Voice-text contradiction detection
+    - Risk assessment with cultural factors
+    
+    Returns:
+        Comprehensive cultural analysis for conversation engine
+    """
+    if not request.text or not request.text.strip():
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="text is required")
+    
+    try:
+        # Get cultural context using existing logic
+        context_response = await get_cultural_context(
+            query=request.text,
+            language=request.language,
+            db=db,
+            credentials=credentials
+        )
+        
+        # Enhanced analysis with voice features
+        analysis = {
+            "text": request.text,
+            "language": request.language,
+            "emotion": request.emotion,
+            "cultural_context": context_response,
+            "risk_factors": [],
+            "conversation_guidance": {},
+            "response_adaptations": []
+        }
+        
+        # Analyze deflection patterns with severity assessment
+        deflection_info = context_response.get("deflection_analysis", {})
+        if deflection_info.get("deflection_detected"):
+            patterns = deflection_info.get("patterns", [])
+            high_risk_patterns = [p for p in patterns if p.get("severity") == "high"]
+            medium_risk_patterns = [p for p in patterns if p.get("severity") == "medium"]
+            critical_risk_patterns = [p for p in patterns if p.get("severity") == "critical"]
+            
+            if critical_risk_patterns:
+                analysis["risk_factors"].append({
+                    "type": "critical_risk_deflection",
+                    "patterns": critical_risk_patterns,
+                    "recommendation": "CRISIS INTERVENTION REQUIRED: Suicide ideation or severe hopelessness detected. Assess safety immediately."
+                })
+            
+            if high_risk_patterns:
+                analysis["risk_factors"].append({
+                    "type": "high_risk_deflection",
+                    "patterns": high_risk_patterns,
+                    "recommendation": "Gentle probing needed, possible crisis risk"
+                })
+            
+            if medium_risk_patterns:
+                analysis["risk_factors"].append({
+                    "type": "medium_risk_deflection", 
+                    "patterns": medium_risk_patterns,
+                    "recommendation": "Supportive exploration recommended"
+                })
+        
+        # Analyze code-switching with emotional correlation
+        code_switching_info = context_response.get("code_switching_analysis", {})
+        if code_switching_info.get("code_switching_detected"):
+            intensity = code_switching_info.get("intensity", "low")
+            analysis["conversation_guidance"]["code_switching"] = {
+                "detected": True,
+                "intensity": intensity,
+                "recommendation": f"Code-switching indicates {intensity} emotional intensity. Consider mirroring language preference."
+            }
+        
+        # Voice-text contradiction analysis
+        if request.voice_features and request.emotion:
+            contradiction_detected = False
+            contradiction_details = []
+            
+            # Check for common contradictions
+            if request.emotion in ["sad", "depressed"] and any(word in request.text.lower() for word in ["fine", "okay", "sawa", "poa"]):
+                contradiction_detected = True
+                contradiction_details.append({
+                    "type": "sad_voice_positive_words",
+                    "description": "Voice indicates sadness but words suggest being okay",
+                    "severity_multiplier": 1.5
+                })
+            
+            if request.emotion in ["anxious", "stressed"] and any(word in request.text.lower() for word in ["normal", "kawaida", "fine"]):
+                contradiction_detected = True
+                contradiction_details.append({
+                    "type": "anxious_voice_normal_words",
+                    "description": "Voice indicates anxiety but words suggest normalcy",
+                    "severity_multiplier": 1.3
+                })
+                contradiction_detected = True
+                contradiction_details.append({
+                    "type": "anxious_voice_normal_words",
+                    "description": "Voice indicates anxiety but words suggest normalcy",
+                    "severity_multiplier": 1.3
+                })
+            
+            if contradiction_detected:
+                analysis["risk_factors"].append({
+                    "type": "voice_text_contradiction",
+                    "details": contradiction_details,
+                    "recommendation": "Voice and words don't match - gentle exploration of true feelings needed"
+                })
+        
+        # Generate conversation guidance
+        cultural_norms = _load_cultural_norms()
+        
+        # Response adaptation suggestions
+        if request.language == "sw" or code_switching_info.get("code_switching_detected"):
+            analysis["response_adaptations"].append({
+                "type": "language_preference",
+                "suggestion": "Consider incorporating Swahili phrases or acknowledging code-switching"
+            })
+        
+        if deflection_info.get("deflection_detected"):
+            patterns = deflection_info.get("patterns", [])
+            for pattern in patterns:
+                probe_suggestions = pattern.get("probe_suggestions", [])
+                if probe_suggestions:
+                    analysis["response_adaptations"].append({
+                        "type": "deflection_response",
+                        "pattern": pattern.get("pattern"),
+                        "suggestions": probe_suggestions[:2]  # Top 2 suggestions
+                    })
+        
+        # Cultural sensitivity guidance
+        if cultural_norms:
+            values = cultural_norms.get("cultural_values", {})
+            if "privacy_and_family_reputation" in values:
+                analysis["conversation_guidance"]["privacy"] = {
+                    "importance": "high",
+                    "recommendation": "Emphasize confidentiality and frame help-seeking as protecting family"
+                }
+            
+            if "spiritual_and_religious_beliefs" in values:
+                analysis["conversation_guidance"]["spirituality"] = {
+                    "importance": "high", 
+                    "recommendation": "Respect spiritual beliefs and integrate them into support"
+                }
+        
+        # Overall risk assessment
+        risk_level = "low"
+        if any(rf["type"] == "critical_risk_deflection" for rf in analysis["risk_factors"]):
+            risk_level = "critical"
+        elif any(rf["type"] == "high_risk_deflection" for rf in analysis["risk_factors"]):
+            risk_level = "high"
+        elif any(rf["type"] in ["medium_risk_deflection", "voice_text_contradiction"] for rf in analysis["risk_factors"]):
+            risk_level = "medium"
+        
+        analysis["overall_risk_level"] = risk_level
+        analysis["timestamp"] = datetime.now(timezone.utc).isoformat()
+        
+        return analysis
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Cultural analysis failed: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Cultural analysis failed: {str(e)}"
         )
 
 

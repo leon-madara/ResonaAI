@@ -215,13 +215,13 @@ const ProfilePage: React.FC = () => {
           ) : (
             <div className="sessions-list">
               {sessions.slice(0, 10).map((session) => (
-                <div key={session.id} className="session-item">
+                <div key={session.session_id} className="session-item">
                   <div className="session-header">
                     <span className="session-date">
                       {new Date(session.started_at).toLocaleDateString()}
                     </span>
-                    {session.crisis_detected && (
-                      <span className="crisis-badge">Crisis Detected</span>
+                    {session.risk_level && session.risk_level !== 'low' && (
+                      <span className="crisis-badge">Risk: {session.risk_level}</span>
                     )}
                   </div>
                   <div className="session-details">
@@ -233,10 +233,11 @@ const ProfilePage: React.FC = () => {
                       <span className="session-messages">{session.message_count} messages</span>
                     )}
                   </div>
-                  {session.emotion_summary && (
+                  {session.primary_emotion && (
                     <div className="session-emotion">
                       <Activity className="w-4 h-4" />
-                      <span>{JSON.stringify(session.emotion_summary)}</span>
+                      <span>Emotion: {session.primary_emotion}</span>
+                      {session.risk_level && <span> | Risk: {session.risk_level}</span>}
                     </div>
                   )}
                 </div>
@@ -330,8 +331,8 @@ const ProfilePage: React.FC = () => {
               style="detailed"
               emotionData={sessions.slice(0, 7).map(s => ({
                 date: s.started_at,
-                emotion: s.emotion_summary?.dominant_emotion || "neutral",
-                confidence: s.emotion_summary?.average_confidence || 0.5
+                emotion: s.primary_emotion || "neutral",
+                confidence: 0.5
               }))}
             />
           )}
@@ -354,39 +355,39 @@ const ProfilePage: React.FC = () => {
                   Your personal voice fingerprint helps us detect changes in your emotional state
                 </p>
                 <div className="baseline-status">
-                  <span className={`status-badge ${baseline.status === 'active' ? 'active' : ''}`}>
-                    {baseline.status === 'active' ? 'Active' : baseline.status}
+                  <span className={`status-badge ${baseline.voice_fingerprint ? 'active' : ''}`}>
+                    {baseline.voice_fingerprint ? 'Active' : 'Not Available'}
                   </span>
                 </div>
               </div>
-              {baseline.baseline_metrics && (
+              {baseline.voice_fingerprint?.features && (
                 <div className="baseline-metrics">
                   <h3 className="metrics-title">Baseline Metrics</h3>
                   <div className="metrics-grid">
-                    {baseline.baseline_metrics.pitch_mean !== undefined && (
+                    {baseline.voice_fingerprint.features.pitch_mean !== undefined && (
                       <div className="metric-item">
                         <span className="metric-label">Pitch Mean</span>
-                        <span className="metric-value">{baseline.baseline_metrics.pitch_mean.toFixed(2)} Hz</span>
+                        <span className="metric-value">{baseline.voice_fingerprint.features.pitch_mean.toFixed(2)} Hz</span>
                       </div>
                     )}
-                    {baseline.baseline_metrics.energy_mean !== undefined && (
+                    {baseline.voice_fingerprint.features.energy_mean !== undefined && (
                       <div className="metric-item">
                         <span className="metric-label">Energy Mean</span>
-                        <span className="metric-value">{baseline.baseline_metrics.energy_mean.toFixed(2)}</span>
+                        <span className="metric-value">{baseline.voice_fingerprint.features.energy_mean.toFixed(2)}</span>
                       </div>
                     )}
-                    {baseline.baseline_metrics.speaking_rate !== undefined && (
+                    {baseline.voice_fingerprint.features.speech_rate !== undefined && (
                       <div className="metric-item">
                         <span className="metric-label">Speaking Rate</span>
-                        <span className="metric-value">{baseline.baseline_metrics.speaking_rate.toFixed(2)} wpm</span>
+                        <span className="metric-value">{baseline.voice_fingerprint.features.speech_rate.toFixed(2)} wpm</span>
                       </div>
                     )}
                   </div>
                 </div>
               )}
-              {baseline.last_updated && (
+              {baseline.voice_fingerprint?.calculated_at && (
                 <p className="baseline-updated">
-                  Last updated: {new Date(baseline.last_updated).toLocaleString()}
+                  Last updated: {new Date(baseline.voice_fingerprint.calculated_at).toLocaleString()}
                 </p>
               )}
               {baseline.deviation_history && baseline.deviation_history.length > 0 && (

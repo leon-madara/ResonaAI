@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     # Knowledge Base Indexing
     AUTO_INDEX_KB: bool = os.getenv("AUTO_INDEX_KB", "true").lower() == "true"
     KB_INDEX_BATCH_SIZE: int = int(os.getenv("KB_INDEX_BATCH_SIZE", "100"))
+    USE_RAG: bool = os.getenv("USE_RAG", "true").lower() == "true"
     
     # Database
     DATABASE_URL: str = os.getenv(

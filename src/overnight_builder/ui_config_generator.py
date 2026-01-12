@@ -124,7 +124,7 @@ class UIConfigGenerator:
                 'trajectory': patterns.emotional_patterns.trajectory,
                 'primary_emotions': patterns.emotional_patterns.primary_emotions,
                 'primary_components': component_names,
-                'dissonance_score': patterns.current_dissonance.dissonance_score,
+                'dissonance_score': patterns.current_dissonance.dissonance_score if patterns.current_dissonance else 0.0,
             }
         }
 
@@ -151,8 +151,8 @@ class UIConfigGenerator:
                 'trajectory': patterns.emotional_patterns.trajectory,
                 'primary_emotions': patterns.emotional_patterns.primary_emotions,
                 'primary_language': patterns.cultural_context.primary_language,
-                'session_count': patterns.baseline.session_count,
-                'dissonance_score': patterns.current_dissonance.dissonance_score,
+                'session_count': patterns.voice_baseline.sessions_analyzed,
+                'dissonance_score': patterns.current_dissonance.dissonance_score if patterns.current_dissonance else 0.0,
                 'trigger_count': patterns.triggers.trigger_count,
                 'effective_coping_count': len(patterns.coping_profile.effective_strategies),
             }

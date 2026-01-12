@@ -66,8 +66,8 @@ class PatternStorageService:
             emotion_distribution=patterns.emotional_patterns.emotion_distribution,
             temporal_patterns=patterns.emotional_patterns.temporal_patterns,
             trajectory=patterns.emotional_patterns.trajectory,
-            trajectory_confidence=patterns.emotional_patterns.trajectory_confidence,
-            variability_score=patterns.emotional_patterns.variability_score,
+            trajectory_confidence=float(patterns.emotional_patterns.trajectory_confidence),
+            variability_score=float(patterns.emotional_patterns.variability_score),
             recent_shift=patterns.emotional_patterns.recent_shift,
 
             # Cultural context
@@ -75,7 +75,7 @@ class PatternStorageService:
             code_switching=patterns.cultural_context.code_switching_detected,
             code_switching_pattern=patterns.cultural_context.code_switching_pattern,
             deflection_phrases=patterns.cultural_context.deflection_phrases_used,
-            deflection_frequency=patterns.cultural_context.deflection_frequency,
+            deflection_frequency=float(patterns.cultural_context.deflection_frequency),
             stoicism_level=patterns.cultural_context.stoicism_level,
             cultural_stressors=patterns.cultural_context.cultural_stressors,
             communication_style=patterns.cultural_context.recommended_approach,
@@ -90,13 +90,13 @@ class PatternStorageService:
             effective_strategies=self._serialize_coping(patterns.coping_profile.effective_strategies),
             ineffective_strategies=self._serialize_coping(patterns.coping_profile.ineffective_strategies),
             untried_suggestions=patterns.coping_profile.untried_suggestions,
-            coping_consistency=patterns.coping_profile.coping_consistency,
+            coping_consistency=float(patterns.coping_profile.coping_consistency),
             primary_coping_style=patterns.coping_profile.primary_coping_style,
 
             # Current state
             current_dissonance=self._serialize_dissonance(patterns.current_dissonance) if patterns.current_dissonance else None,
             current_risk_level=patterns.current_risk.risk_level,
-            current_risk_score=patterns.current_risk.risk_score,
+            current_risk_score=float(patterns.current_risk.risk_score),
             current_risk_factors=patterns.current_risk.risk_factors,
 
             # Mental health profile
@@ -413,7 +413,7 @@ class PatternStorageService:
             'voice_emotion': session.voice_emotion,
             'emotion_confidence': session.emotion_confidence,
             'voice_features': session.voice_features,
-            'transcript': None,  # Encrypted, not returned
+            'transcript': session.transcript_encrypted,  # Use transcript (in real app, decrypt first)
             'language': session.transcript_language
         }
 
@@ -472,17 +472,35 @@ class PatternStorageService:
 
         next_version = (current.version + 1) if current else 1
 
+        # Get current pattern_id
+        current_pattern = self.db.query(UserPattern).filter(
+            and_(
+                UserPattern.user_id == user_id,
+                UserPattern.is_current == True
+            )
+        ).first()
+        
+        # Determine crisis prominence string
+        risk_level = metadata.get('risk_level', 'low')
+        if risk_level == 'critical':
+            crisis_prom = 'modal'
+        elif risk_level == 'high':
+            crisis_prom = 'top'
+        elif risk_level == 'medium':
+            crisis_prom = 'sidebar'
+        else:
+            crisis_prom = 'hidden'
+        
         # Create new config record
         config_record = InterfaceConfig(
             user_id=user_id,
-            version=next_version,
+            pattern_id=current_pattern.pattern_id if current_pattern else None,
+            version=str(next_version),
             ui_config_encrypted=encrypted_config,
-            encryption_salt=salt,
             theme=metadata.get('theme'),
             primary_components=metadata.get('primary_components', []),
             hidden_components=metadata.get('hidden_components', []),
-            crisis_prominence=metadata.get('risk_level') in ['high', 'critical'],
-            is_current=True,
+            crisis_prominence=crisis_prom,
             deployed=False
         )
 
@@ -509,14 +527,26 @@ class PatternStorageService:
         """
         change_records = []
 
+        # Get latest config_id for this user
+        latest_config = self.db.query(InterfaceConfig).filter(
+            and_(
+                InterfaceConfig.user_id == user_id,
+                InterfaceConfig.is_current == True
+            )
+        ).first()
+        
+        if not latest_config:
+            return []  # No config to associate changes with
+        
         for change_data in changes:
             change_record = InterfaceChange(
                 user_id=user_id,
-                change_type=change_data.get('change_type'),
+                config_id=latest_config.config_id,
+                change_type=change_data.get('change_type', 'update'),
                 component_affected=change_data.get('component'),
-                reason=change_data.get('reason'),
-                severity=change_data.get('severity', 'low'),
-                acknowledged=False
+                reason=change_data.get('reason', 'Pattern change detected'),
+                shown_to_user=False,
+                user_acknowledged=False
             )
 
             self.db.add(change_record)

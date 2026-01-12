@@ -6,7 +6,7 @@ Maps to the PostgreSQL schema defined in migrations/001_initial_schema.sql
 
 from sqlalchemy import (
     Column, String, Integer, Float, Boolean, TIMESTAMP,
-    Text, ForeignKey, CheckConstraint, UniqueConstraint, ARRAY
+    Text, ForeignKey, CheckConstraint, UniqueConstraint, ARRAY, Index, text as sql_text
 )
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.ext.declarative import declarative_base
@@ -163,7 +163,7 @@ class UserPattern(Base):
             "current_state IN ('crisis', 'struggling', 'managing', 'stable', 'improving')"
         ),
         CheckConstraint("data_confidence >= 0 AND data_confidence <= 1"),
-        UniqueConstraint('user_id', name='uq_user_current_pattern', postgresql_where=(is_current == True)),
+        Index('uq_user_current_pattern', 'user_id', unique=True, postgresql_where=sql_text('is_current = true')),
     )
 
     def __repr__(self):
@@ -211,7 +211,7 @@ class VoiceBaseline(Base):
 
     __table_args__ = (
         CheckConstraint("sessions_analyzed >= 0"),
-        UniqueConstraint('user_id', name='uq_user_current_baseline', postgresql_where=(is_current == True)),
+        Index('uq_user_current_baseline', 'user_id', unique=True, postgresql_where=sql_text('is_current = true')),
     )
 
     def __repr__(self):
@@ -259,7 +259,7 @@ class InterfaceConfig(Base):
         CheckConstraint("theme IN ('anxiety', 'depression', 'crisis', 'stable', 'balanced')"),
         CheckConstraint("crisis_prominence IN ('hidden', 'sidebar', 'card', 'top', 'modal')"),
         CheckConstraint("user_rating >= 1 AND user_rating <= 5"),
-        UniqueConstraint('user_id', name='uq_user_current_config', postgresql_where=(is_current == True)),
+        Index('uq_user_current_config', 'user_id', unique=True, postgresql_where=sql_text('is_current = true')),
     )
 
     def __repr__(self):

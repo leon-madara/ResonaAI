@@ -251,7 +251,7 @@ class ChangeDetector:
             if new_lang == 'swahili':
                 reason = "We've noticed you've been speaking more Swahili, especially during emotional moments. " \
                          "Your interface now includes more Swahili to match how you naturally express yourself."
-            elif patterns.cultural_context.code_switching:
+            elif patterns.cultural_context.code_switching_detected:
                 reason = "We notice you mix English and Swahili. Your interface now reflects this, " \
                          "using both languages naturally like you do."
             else:
@@ -277,7 +277,7 @@ class ChangeDetector:
         changes = []
 
         # Check if dissonance was newly detected
-        if patterns.current_dissonance.dissonance_score > 0.7:
+        if patterns.current_dissonance and patterns.current_dissonance.dissonance_score > 0.7:
             prev_had_dissonance = 'DissonanceIndicator' in previous_config.get('metadata', {}).get('primary_components', [])
             new_has_dissonance = 'DissonanceIndicator' in new_config.get('metadata', {}).get('primary_components', [])
 

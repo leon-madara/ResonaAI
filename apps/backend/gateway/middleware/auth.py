@@ -23,6 +23,10 @@ class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: Callable):
         """Process request with authentication"""
         
+        # Allow OPTIONS requests (CORS preflight) to pass through
+        if request.method == "OPTIONS":
+            return await call_next(request)
+        
         # Skip authentication for public endpoints
         public_endpoints = [
             "/health",
