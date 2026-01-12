@@ -1,0 +1,89 @@
+{
+  "timestamp": "1768250940.8290756",
+  "system_info": {
+    "platform": "Windows-11-10.0.26200-SP0",
+    "system": "Windows",
+    "release": "11",
+    "version": "10.0.26200",
+    "machine": "AMD64",
+    "processor": "Intel64 Family 6 Model 142 Stepping 12, GenuineIntel",
+    "python_version": "3.14.2",
+    "python_implementation": "CPython",
+    "python_executable": "C:\\Users\\Naomi Lang'at\\AppData\\Local\\Programs\\Python\\Python314\\python.exe"
+  },
+  "python_version": {
+    "version": "3.14.2",
+    "compatible": true,
+    "minimum_required": "3.8.0",
+    "recommended": "3.10.0+",
+    "status": "\u2705 Compatible"
+  },
+  "node_version": {
+    "version": "25.2.1",
+    "compatible": true,
+    "minimum_required": "16.0.0",
+    "recommended": "18.0.0+",
+    "status": "\u2705 Compatible"
+  },
+  "npm_version": {
+    "version": "Not found",
+    "compatible": false,
+    "minimum_required": "8.0.0",
+    "status": "\u274c Not installed"
+  },
+  "python_dependencies": {
+    "packages": {
+      "fastapi": {
+        "installed": true,
+        "status": "\u2705 Installed"
+      },
+      "pydantic": {
+        "installed": true,
+        "status": "\u2705 Installed"
+      },
+      "hypothesis": {
+        "installed": true,
+        "status": "\u2705 Installed"
+      },
+      "uvicorn": {
+        "installed": true,
+        "status": "\u2705 Installed"
+      },
+      "websockets": {
+        "installed": true,
+        "status": "\u2705 Installed"
+      }
+    },
+    "all_installed": true,
+    "status": "\u2705 All dependencies installed"
+  },
+  "port_availability": {
+    "ports": {
+      "3000": {
+        "available": true,
+        "status": "\u2705 Available"
+      },
+      "8001": {
+        "available": true,
+        "status": "\u2705 Available"
+      }
+    },
+    "all_available": true,
+    "status": "\u2705 All ports available"
+  },
+  "file_permissions": {
+    "can_create_directory": true,
+    "can_write_files": true,
+    "can_read_files": true,
+    "can_delete_files": true,
+    "status": "\u2705 All permissions OK"
+  },
+  "demo_functionality": {
+    "imports": false,
+    "configuration": false,
+    "storage": false,
+    "generation": false,
+    "status": "\u274c Error: No module named 'scripts'"
+  },
+  "overall_status": false
+}

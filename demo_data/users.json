@@ -1,0 +1,240 @@
+{
+  "users": [
+    {
+      "id": "user_001",
+      "age": 25,
+      "gender": "male",
+      "location": "Dar es Salaam, Tanzania",
+      "primary_language": "Swahili",
+      "secondary_language": "English",
+      "cultural_background": "Bena",
+      "education_level": "secondary",
+      "occupation": "student",
+      "baseline_data": {
+        "voice_patterns": {
+          "average_pitch": 159.52636561474992,
+          "speech_rate": 165.97250730699923,
+          "emotional_baseline": "happy",
+          "stress_indicators": [
+            "articulation_changes",
+            "breathing_changes",
+            "vocal_tension",
+            "volume_variation"
+          ]
+        },
+        "emotional_patterns": {
+          "dominant_emotions": [
+            "angry",
+            "sad"
+          ],
+          "crisis_triggers": [
+            "financial_stress",
+            "relationship_issues"
+          ],
+          "coping_mechanisms": [
+            "journaling",
+            "traditional_healing",
+            "community_support"
+          ]
+        }
+      },
+      "session_history": [
+        {
+          "session_id": "user_001_session_01",
+          "date": "2025-10-13T23:45:17.197027",
+          "duration_minutes": 32,
+          "emotional_state": "sad",
+          "topics_discussed": [
+            "career_development",
+            "work_stress"
+          ],
+          "crisis_level": "none",
+          "intervention_needed": false
+        },
+        {
+          "session_id": "user_001_session_02",
+          "date": "2025-10-19T23:45:17.197027",
+          "duration_minutes": 35,
+          "emotional_state": "neutral",
+          "topics_discussed": [
+            "financial_concerns",
+            "language_preservation",
+            "community_expectations"
+          ],
+          "crisis_level": "none",
+          "intervention_needed": false
+        },
+        {
+          "session_id": "user_001_session_03",
+          "date": "2025-11-03T23:45:17.197027",
+          "duration_minutes": 31,
+          "emotional_state": "sad",
+          "topics_discussed": [
+            "cultural_identity",
+            "financial_concerns"
+          ],
+          "crisis_level": "none",
+          "intervention_needed": false
+        },
+        {
+          "session_id": "user_001_session_04",
+          "date": "2025-11-20T23:45:17.197027",
+          "duration_minutes": 35,
+          "emotional_state": "neutral",
+          "topics_discussed": [
+            "cultural_practices",
+            "relationship_problems",
+            "financial_concerns"
+          ],
+          "crisis_level": "none",
+          "intervention_needed": false
+        },
+        {
+          "session_id": "user_001_session_05",
+          "date": "2025-12-05T23:45:17.197027",
+          "duration_minutes": 14,
+          "emotional_state": "sad",
+          "topics_discussed": [
+            "depression",
+            "modern_vs_traditional"
+          ],
+          "crisis_level": "none",
+          "intervention_needed": false
+        },
+        {
+          "session_id": "user_001_session_06",
+          "date": "2025-12-24T23:45:17.197027",
+          "duration_minutes": 33,
+          "emotional_state": "happy",
+          "topics_discussed": [
+            "cultural_identity",
+            "financial_concerns",
+            "health_concerns",
+            "achievements"
+          ],
+          "crisis_level": "none",
+          "intervention_needed": false
+        },
+        {
+          "session_id": "user_001_session_07",
+          "date": "2026-01-08T23:45:17.197027",
+          "duration_minutes": 20,
+          "emotional_state": "happy",
+          "topics_discussed": [
+            "language_preservation",
+            "achievements",
+            "relationship_problems",
+            "traditional_values"
+          ],
+          "crisis_level": "low",
+          "intervention_needed": false
+        }
+      ]
+    },
+    {
+      "id": "user_002",
+      "age": 35,
+      "gender": "male",
+      "location": "Garissa, Kenya",
+      "primary_language": "Swahili",
+      "secondary_language": "English",
+      "cultural_background": "Luo",
+      "education_level": "high_school",
+      "occupation": "driver",
+      "baseline_data": {
+        "voice_patterns": {
+          "average_pitch": 139.3104779608197,
+          "speech_rate": 157.13639681134651,
+          "emotional_baseline": "neutral",
+          "stress_indicators": [
+            "speech_acceleration",
+            "pace_irregularity"
+          ]
+        },
+        "emotional_patterns": {
+          "dominant_emotions": [
+            "happy",
+            "angry",
+            "neutral"
+          ],
+          "crisis_triggers": [
+            "work_pressure"
+          ],
+          "coping_mechanisms": [
+            "exercise",
+            "spiritual_guidance",
+            "storytelling"
+          ]
+        }
+      },
+      "session_history": [
+        {
+          "session_id": "user_002_session_01",
+          "date": "2025-10-20T23:45:17.197565",
+          "duration_minutes": 31,
+          "emotional_state": "surprise",
+          "topics_discussed": [
+            "career_development",
+            "financial_concerns",
+            "cultural_identity"
+          ],
+          "crisis_level": "none",
+          "intervention_needed": false
+        }
+      ]
+    },
+    {
+      "id": "user_003",
+      "age": 28,
+      "gender": "female",
+      "location": "Hoima, Uganda",
+      "primary_language": "English",
+      "secondary_language": "Swahili",
+      "cultural_background": "Acholi",
+      "education_level": "high_school",
+      "occupation": "shop_keeper",
+      "baseline_data": {
+        "voice_patterns": {
+          "average_pitch": 208.02112354221248,
+          "speech_rate": 170.02204331983418,
+          "emotional_baseline": "neutral",
+          "stress_indicators": [
+            "vocal_tension",
+            "voice_tremor",
+            "volume_variation",
+            "speech_acceleration"
+          ]
+        },
+        "emotional_patterns": {
+          "dominant_emotions": [
+            "neutral",
+            "happy",
+            "angry"
+          ],
+          "crisis_triggers": [
+            "family_responsibilities"
+          ],
+          "coping_mechanisms": [
+            "nature",
+            "prayer",
+            "music"
+          ]
+        }
+      },
+      "session_history": [
+        {
+          "session_id": "user_003_session_01",
+          "date": "2025-10-20T23:45:17.197732",
+          "duration_minutes": 37,
+          "emotional_state": "happy",
+          "topics_discussed": [
+            "financial_concerns",
+            "cultural_practices"
+          ],
+          "crisis_level": "none",
+          "intervention_needed": false
+        }
+      ]
+    }
+  ]
+}

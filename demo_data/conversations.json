@@ -1,0 +1,1140 @@
+{
+  "conversations": [
+    {
+      "id": "conv_1c226600",
+      "user_id": "user_001",
+      "scenario": "academic_pressure",
+      "messages": [
+        {
+          "id": "msg_0008598a",
+          "timestamp": "2026-01-12T23:37:17.203004",
+          "speaker": "user",
+          "text": "I'm struggling with my studies lately",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.7220368420447005,
+            "voice_truth_gap": 0.2058733964840304,
+            "features": null
+          },
+          "cultural_context": {
+            "patterns": [
+              "crisis_indicators",
+              "academic_pressure"
+            ],
+            "deflection_detected": false,
+            "cultural_significance": "medium",
+            "language_switches": []
+          }
+        },
+        {
+          "id": "msg_2da0745a",
+          "timestamp": "2026-01-12T23:37:47.203081",
+          "speaker": "assistant",
+          "text": "I understand you're feeling overwhelmed with your studies. Can you tell me more about what's making it difficult?",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.8770398471397793,
+            "voice_truth_gap": null,
+            "features": null
+          },
+          "cultural_context": null
+        },
+        {
+          "id": "msg_0657d7b8",
+          "timestamp": "2026-01-12T23:38:17.203142",
+          "speaker": "user",
+          "text": "I just want the pain to stop",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.8040003557716571,
+            "voice_truth_gap": 0.3298668777242183,
+            "features": null
+          },
+          "cultural_context": {
+            "patterns": [
+              "crisis_indicators"
+            ],
+            "deflection_detected": false,
+            "cultural_significance": "high",
+            "language_switches": []
+          }
+        },
+        {
+          "id": "msg_c7c4ba9e",
+          "timestamp": "2026-01-12T23:38:47.203175",
+          "speaker": "assistant",
+          "text": "Academic pressure can be really challenging. What specific subjects or areas are causing you the most stress?",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.8615054362136447,
+            "voice_truth_gap": null,
+            "features": null
+          },
+          "cultural_context": null
+        },
+        {
+          "id": "msg_597d4a07",
+          "timestamp": "2026-01-12T23:39:17.203217",
+          "speaker": "user",
+          "text": "The pressure is getting too much",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.748151106717213,
+            "voice_truth_gap": 0.3564225456366492,
+            "features": null
+          },
+          "cultural_context": {
+            "patterns": [
+              "crisis_indicators"
+            ],
+            "deflection_detected": false,
+            "cultural_significance": "high",
+            "language_switches": [
+              "swahili"
+            ]
+          }
+        },
+        {
+          "id": "msg_48459447",
+          "timestamp": "2026-01-12T23:39:47.203247",
+          "speaker": "assistant",
+          "text": "It sounds like you're carrying a heavy burden. Have you been able to talk to anyone about how you're feeling?",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.8572406886963084,
+            "voice_truth_gap": null,
+            "features": null
+          },
+          "cultural_context": null
+        },
+        {
+          "id": "msg_ab2e59d0",
+          "timestamp": "2026-01-12T23:40:17.203276",
+          "speaker": "user",
+          "text": "I feel so tired all the time",
+          "emotion": {
+            "detected": "fear",
+            "confidence": 0.785602702003967,
+            "voice_truth_gap": 0.9274976326100234,
+            "features": null
+          },
+          "cultural_context": {
+            "patterns": [
+              "crisis_indicators"
+            ],
+            "deflection_detected": false,
+            "cultural_significance": "high",
+            "language_switches": [
+              "swahili"
+            ]
+          }
+        },
+        {
+          "id": "msg_4460e1e5",
+          "timestamp": "2026-01-12T23:40:47.203299",
+          "speaker": "assistant",
+          "text": "These feelings can be overwhelming, but they can change with proper support.",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.8878245135456041,
+            "voice_truth_gap": null,
+            "features": null
+          },
+          "cultural_context": null
+        },
+        {
+          "id": "msg_8b79b763",
+          "timestamp": "2026-01-12T23:41:17.203331",
+          "speaker": "user",
+          "text": "Maybe I should just give up",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.8647070524234689,
+            "voice_truth_gap": 0.38856428321317915,
+            "features": null
+          },
+          "cultural_context": {
+            "patterns": [
+              "crisis_indicators"
+            ],
+            "deflection_detected": false,
+            "cultural_significance": "high",
+            "language_switches": []
+          }
+        },
+        {
+          "id": "msg_ae93314c",
+          "timestamp": "2026-01-12T23:41:47.203359",
+          "speaker": "assistant",
+          "text": "These feelings can be overwhelming, but they can change with proper support.",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.9297954418672851,
+            "voice_truth_gap": null,
+            "features": null
+          },
+          "cultural_context": null
+        }
+      ],
+      "emotional_arc": {
+        "start_emotion": "neutral",
+        "progression": [
+          "neutral",
+          "neutral",
+          "neutral",
+          "fear",
+          "neutral",
+          "neutral",
+          "neutral",
+          "fear"
+        ],
+        "end_emotion": "fear",
+        "crisis_level": "critical"
+      },
+      "duration_minutes": 39,
+      "created_at": "2026-01-10T23:45:17.203543"
+    },
+    {
+      "id": "conv_478b1dd2",
+      "user_id": "user_001",
+      "scenario": "family_issues",
+      "messages": [
+        {
+          "id": "msg_465ddf01",
+          "timestamp": "2026-01-12T23:35:17.203951",
+          "speaker": "user",
+          "text": "My family doesn't understand me",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.6965450029601818,
+            "voice_truth_gap": 0.17031006360750972,
+            "features": null
+          },
+          "cultural_context": {
+            "patterns": [
+              "family_dynamics"
+            ],
+            "deflection_detected": false,
+            "cultural_significance": "high",
+            "language_switches": []
+          }
+        },
+        {
+          "id": "msg_3159271e",
+          "timestamp": "2026-01-12T23:35:47.203997",
+          "speaker": "assistant",
+          "text": "Family relationships can be complex. What makes you feel like they don't understand you?",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.8600941879863317,
+            "voice_truth_gap": null,
+            "features": null
+          },
+          "cultural_context": null
+        },
+        {
+          "id": "msg_cb349812",
+          "timestamp": "2026-01-12T23:36:17.204031",
+          "speaker": "user",
+          "text": "Wazazi wangu hawanielwi",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.6770897256448651,
+            "voice_truth_gap": 0.061867246675306166,
+            "features": null
+          },
+          "cultural_context": {
+            "patterns": [
+              "family_dynamics"
+            ],
+            "deflection_detected": false,
+            "cultural_significance": "high",
+            "language_switches": []
+          }
+        },
+        {
+          "id": "msg_db48e291",
+          "timestamp": "2026-01-12T23:36:47.204054",
+          "speaker": "assistant",
+          "text": "It sounds like there's a lot of pressure from your family. Can you share what kind of expectations they have?",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.8813524257072783,
+            "voice_truth_gap": null,
+            "features": null
+          },
+          "cultural_context": null
+        },
+        {
+          "id": "msg_4f7840fa",
+          "timestamp": "2026-01-12T23:37:17.204082",
+          "speaker": "user",
+          "text": "They expect too much from me",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.8087138690507344,
+            "voice_truth_gap": 0.17976942519155734,
+            "features": null
+          },
+          "cultural_context": {
+            "patterns": [],
+            "deflection_detected": false,
+            "cultural_significance": "low",
+            "language_switches": []
+          }
+        },
+        {
+          "id": "msg_24491f59",
+          "timestamp": "2026-01-12T23:37:47.204104",
+          "speaker": "assistant",
+          "text": "Cultural and generational differences can create tension. What specific areas do you clash on?",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.9474323214332645,
+            "voice_truth_gap": null,
+            "features": null
+          },
+          "cultural_context": null
+        },
+        {
+          "id": "msg_ae1950f1",
+          "timestamp": "2026-01-12T23:38:17.204134",
+          "speaker": "user",
+          "text": "I can't live up to their expectations",
+          "emotion": {
+            "detected": "angry",
+            "confidence": 0.8233886055132987,
+            "voice_truth_gap": 0.27804647832183954,
+            "features": null
+          },
+          "cultural_context": {
+            "patterns": [],
+            "deflection_detected": false,
+            "cultural_significance": "low",
+            "language_switches": []
+          }
+        },
+        {
+          "id": "msg_c1602bb1",
+          "timestamp": "2026-01-12T23:38:47.204160",
+          "speaker": "assistant",
+          "text": "Running away might feel like a solution, but let's talk about other ways to address these feelings.",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.9110586623711117,
+            "voice_truth_gap": null,
+            "features": null
+          },
+          "cultural_context": null
+        },
+        {
+          "id": "msg_f17ffc9a",
+          "timestamp": "2026-01-12T23:39:17.204187",
+          "speaker": "user",
+          "text": "Sometimes I just want to run away",
+          "emotion": {
+            "detected": "angry",
+            "confidence": 0.7578012762841296,
+            "voice_truth_gap": 0.2269298810537009,
+            "features": null
+          },
+          "cultural_context": {
+            "patterns": [],
+            "deflection_detected": false,
+            "cultural_significance": "low",
+            "language_switches": []
+          }
+        },
+        {
+          "id": "msg_bbe002e1",
+          "timestamp": "2026-01-12T23:39:47.204210",
+          "speaker": "assistant",
+          "text": "Have you tried having an open conversation with your family about how their expectations affect you?",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.8839692979302347,
+            "voice_truth_gap": null,
+            "features": null
+          },
+          "cultural_context": null
+        }
+      ],
+      "emotional_arc": {
+        "start_emotion": "neutral",
+        "progression": [
+          "neutral",
+          "neutral",
+          "neutral",
+          "angry",
+          "angry",
+          "angry",
+          "angry",
+          "angry",
+          "neutral",
+          "angry"
+        ],
+        "end_emotion": "angry",
+        "crisis_level": "medium"
+      },
+      "duration_minutes": 10,
+      "created_at": "2026-01-12T23:45:17.204340"
+    },
+    {
+      "id": "conv_d9a7993a",
+      "user_id": "user_002",
+      "scenario": "academic_pressure",
+      "messages": [
+        {
+          "id": "msg_b4c32e4a",
+          "timestamp": "2026-01-12T23:37:17.204614",
+          "speaker": "user",
+          "text": "I'm struggling with my studies lately",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.740112576555545,
+            "voice_truth_gap": 0.11216154887983625,
+            "features": null
+          },
+          "cultural_context": {
+            "patterns": [
+              "academic_pressure"
+            ],
+            "deflection_detected": false,
+            "cultural_significance": "medium",
+            "language_switches": [
+              "swahili"
+            ]
+          }
+        },
+        {
+          "id": "msg_caec1e5f",
+          "timestamp": "2026-01-12T23:37:47.204652",
+          "speaker": "assistant",
+          "text": "I understand you're feeling overwhelmed with your studies. Can you tell me more about what's making it difficult?",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.8509399083608268,
+            "voice_truth_gap": null,
+            "features": null
+          },
+          "cultural_context": null
+        },
+        {
+          "id": "msg_8ecd805c",
+          "timestamp": "2026-01-12T23:38:17.204682",
+          "speaker": "user",
+          "text": "Nimechoka na masomo, sijui nifanye nini",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.6632771477237644,
+            "voice_truth_gap": 0.1417820585142256,
+            "features": null
+          },
+          "cultural_context": {
+            "patterns": [
+              "academic_pressure"
+            ],
+            "deflection_detected": false,
+            "cultural_significance": "medium",
+            "language_switches": []
+          }
+        },
+        {
+          "id": "msg_7de55cdf",
+          "timestamp": "2026-01-12T23:38:47.204716",
+          "speaker": "assistant",
+          "text": "Academic pressure can be really challenging. What specific subjects or areas are causing you the most stress?",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.9436642499806421,
+            "voice_truth_gap": null,
+            "features": null
+          },
+          "cultural_context": null
+        },
+        {
+          "id": "msg_02fb14ab",
+          "timestamp": "2026-01-12T23:39:17.204750",
+          "speaker": "user",
+          "text": "The pressure is getting too much",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.7735420738581104,
+            "voice_truth_gap": 0.10049277331637495,
+            "features": null
+          },
+          "cultural_context": {
+            "patterns": [],
+            "deflection_detected": false,
+            "cultural_significance": "low",
+            "language_switches": [
+              "swahili"
+            ]
+          }
+        },
+        {
+          "id": "msg_35e513a6",
+          "timestamp": "2026-01-12T23:39:47.204773",
+          "speaker": "assistant",
+          "text": "It sounds like you're carrying a heavy burden. Have you been able to talk to anyone about how you're feeling?",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.947513235124891,
+            "voice_truth_gap": null,
+            "features": null
+          },
+          "cultural_context": null
+        },
+        {
+          "id": "msg_e60e0435",
+          "timestamp": "2026-01-12T23:40:17.204798",
+          "speaker": "user",
+          "text": "I feel like I'm failing everyone",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.8616412018151081,
+            "voice_truth_gap": 0.11691123278906587,
+            "features": null
+          },
+          "cultural_context": {
+            "patterns": [],
+            "deflection_detected": false,
+            "cultural_significance": "low",
+            "language_switches": []
+          }
+        },
+        {
+          "id": "msg_5934286c",
+          "timestamp": "2026-01-12T23:40:47.204819",
+          "speaker": "assistant",
+          "text": "Those feelings are valid, but giving up isn't the only option. Let's explore some ways to manage this stress together.",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.9405937148411387,
+            "voice_truth_gap": null,
+            "features": null
+          },
+          "cultural_context": null
+        },
+        {
+          "id": "msg_84355a4a",
+          "timestamp": "2026-01-12T23:41:17.204845",
+          "speaker": "user",
+          "text": "Maybe I should just give up",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.8172759509191251,
+            "voice_truth_gap": 0.05947890546501559,
+            "features": null
+          },
+          "cultural_context": {
+            "patterns": [],
+            "deflection_detected": false,
+            "cultural_significance": "low",
+            "language_switches": []
+          }
+        },
+        {
+          "id": "msg_5beb31cf",
+          "timestamp": "2026-01-12T23:41:47.204866",
+          "speaker": "assistant",
+          "text": "You mentioned feeling like you're failing everyone. Can you help me understand who you feel you're letting down?",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.900996105965679,
+            "voice_truth_gap": null,
+            "features": null
+          },
+          "cultural_context": null
+        }
+      ],
+      "emotional_arc": {
+        "start_emotion": "neutral",
+        "progression": [
+          "neutral",
+          "neutral",
+          "neutral",
+          "neutral",
+          "neutral",
+          "neutral",
+          "neutral",
+          "sad"
+        ],
+        "end_emotion": "sad",
+        "crisis_level": "low"
+      },
+      "duration_minutes": 24,
+      "created_at": "2026-01-02T23:45:17.204957"
+    },
+    {
+      "id": "conv_e109ebc3",
+      "user_id": "user_002",
+      "scenario": "family_issues",
+      "messages": [
+        {
+          "id": "msg_28f2770c",
+          "timestamp": "2026-01-12T23:35:17.205387",
+          "speaker": "user",
+          "text": "My family doesn't understand me",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.855695225318981,
+            "voice_truth_gap": 0.21219978826918678,
+            "features": null
+          },
+          "cultural_context": {
+            "patterns": [
+              "crisis_indicators",
+              "family_dynamics"
+            ],
+            "deflection_detected": false,
+            "cultural_significance": "high",
+            "language_switches": [
+              "swahili"
+            ]
+          }
+        },
+        {
+          "id": "msg_92876618",
+          "timestamp": "2026-01-12T23:35:47.205423",
+          "speaker": "assistant",
+          "text": "Family relationships can be complex. What makes you feel like they don't understand you?",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.9337686541911422,
+            "voice_truth_gap": null,
+            "features": null
+          },
+          "cultural_context": null
+        },
+        {
+          "id": "msg_a30c55ad",
+          "timestamp": "2026-01-12T23:36:17.205456",
+          "speaker": "user",
+          "text": "I've been thinking a lot lately",
+          "emotion": {
+            "detected": "fear",
+            "confidence": 0.6847801402878305,
+            "voice_truth_gap": 1.0,
+            "features": null
+          },
+          "cultural_context": {
+            "patterns": [
+              "crisis_indicators"
+            ],
+            "deflection_detected": false,
+            "cultural_significance": "high",
+            "language_switches": []
+          }
+        },
+        {
+          "id": "msg_9814fdf9",
+          "timestamp": "2026-01-12T23:36:47.205479",
+          "speaker": "assistant",
+          "text": "It sounds like there's a lot of pressure from your family. Can you share what kind of expectations they have?",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.9047672818068474,
+            "voice_truth_gap": null,
+            "features": null
+          },
+          "cultural_context": null
+        },
+        {
+          "id": "msg_5541bf60",
+          "timestamp": "2026-01-12T23:37:17.205506",
+          "speaker": "user",
+          "text": "They expect too much from me",
+          "emotion": {
+            "detected": "fear",
+            "confidence": 0.6282954858737272,
+            "voice_truth_gap": 0.8059434270482757,
+            "features": null
+          },
+          "cultural_context": {
+            "patterns": [
+              "crisis_indicators"
+            ],
+            "deflection_detected": false,
+            "cultural_significance": "high",
+            "language_switches": [
+              "swahili"
+            ]
+          }
+        },
+        {
+          "id": "msg_356f8143",
+          "timestamp": "2026-01-12T23:37:47.205535",
+          "speaker": "assistant",
+          "text": "Cultural and generational differences can create tension. What specific areas do you clash on?",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.9066033784723645,
+            "voice_truth_gap": null,
+            "features": null
+          },
+          "cultural_context": null
+        },
+        {
+          "id": "msg_052f9a97",
+          "timestamp": "2026-01-12T23:38:17.205562",
+          "speaker": "user",
+          "text": "I feel so tired all the time",
+          "emotion": {
+            "detected": "fear",
+            "confidence": 0.7863334723291678,
+            "voice_truth_gap": 1.0,
+            "features": null
+          },
+          "cultural_context": {
+            "patterns": [
+              "crisis_indicators"
+            ],
+            "deflection_detected": false,
+            "cultural_significance": "high",
+            "language_switches": []
+          }
+        },
+        {
+          "id": "msg_409c0572",
+          "timestamp": "2026-01-12T23:38:47.205583",
+          "speaker": "assistant",
+          "text": "Your safety is the most important thing right now. Let's talk about getting you help.",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.8970816505082541,
+            "voice_truth_gap": null,
+            "features": null
+          },
+          "cultural_context": null
+        },
+        {
+          "id": "msg_37bafff9",
+          "timestamp": "2026-01-12T23:39:17.205613",
+          "speaker": "user",
+          "text": "Sometimes I just want to run away",
+          "emotion": {
+            "detected": "fear",
+            "confidence": 0.7528320663763933,
+            "voice_truth_gap": 0.9532886585560503,
+            "features": null
+          },
+          "cultural_context": {
+            "patterns": [
+              "crisis_indicators"
+            ],
+            "deflection_detected": false,
+            "cultural_significance": "high",
+            "language_switches": []
+          }
+        },
+        {
+          "id": "msg_bbe98c90",
+          "timestamp": "2026-01-12T23:39:47.205634",
+          "speaker": "assistant",
+          "text": "Your safety is the most important thing right now. Let's talk about getting you help.",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.9152002185087793,
+            "voice_truth_gap": null,
+            "features": null
+          },
+          "cultural_context": null
+        }
+      ],
+      "emotional_arc": {
+        "start_emotion": "neutral",
+        "progression": [
+          "neutral",
+          "fear",
+          "fear",
+          "fear",
+          "fear",
+          "neutral",
+          "fear",
+          "fear",
+          "neutral",
+          "fear"
+        ],
+        "end_emotion": "fear",
+        "crisis_level": "critical"
+      },
+      "duration_minutes": 18,
+      "created_at": "2025-12-24T23:45:17.205763"
+    },
+    {
+      "id": "conv_3e99596e",
+      "user_id": "user_003",
+      "scenario": "academic_pressure",
+      "messages": [
+        {
+          "id": "msg_87339a26",
+          "timestamp": "2026-01-12T23:37:17.206042",
+          "speaker": "user",
+          "text": "I'm struggling with my studies lately",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.7282766785531656,
+            "voice_truth_gap": 0.020469776509738555,
+            "features": null
+          },
+          "cultural_context": {
+            "patterns": [
+              "academic_pressure"
+            ],
+            "deflection_detected": false,
+            "cultural_significance": "medium",
+            "language_switches": []
+          }
+        },
+        {
+          "id": "msg_fea97397",
+          "timestamp": "2026-01-12T23:37:47.206071",
+          "speaker": "assistant",
+          "text": "I understand you're feeling overwhelmed with your studies. Can you tell me more about what's making it difficult?",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.9016707982888039,
+            "voice_truth_gap": null,
+            "features": null
+          },
+          "cultural_context": null
+        },
+        {
+          "id": "msg_a9c911f6",
+          "timestamp": "2026-01-12T23:38:17.206107",
+          "speaker": "user",
+          "text": "Nimechoka na masomo, sijui nifanye nini",
+          "emotion": {
+            "detected": "sad",
+            "confidence": 0.720525428548069,
+            "voice_truth_gap": 0.22946029323746353,
+            "features": null
+          },
+          "cultural_context": {
+            "patterns": [
+              "academic_pressure"
+            ],
+            "deflection_detected": false,
+            "cultural_significance": "medium",
+            "language_switches": []
+          }
+        },
+        {
+          "id": "msg_5aa7f597",
+          "timestamp": "2026-01-12T23:38:47.206130",
+          "speaker": "assistant",
+          "text": "Academic pressure can be really challenging. What specific subjects or areas are causing you the most stress?",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.921959220030113,
+            "voice_truth_gap": null,
+            "features": null
+          },
+          "cultural_context": null
+        },
+        {
+          "id": "msg_aed3b8cf",
+          "timestamp": "2026-01-12T23:39:17.206161",
+          "speaker": "user",
+          "text": "The pressure is getting too much",
+          "emotion": {
+            "detected": "sad",
+            "confidence": 0.7126364122599237,
+            "voice_truth_gap": 0.35321390694548316,
+            "features": null
+          },
+          "cultural_context": {
+            "patterns": [],
+            "deflection_detected": false,
+            "cultural_significance": "low",
+            "language_switches": [
+              "swahili"
+            ]
+          }
+        },
+        {
+          "id": "msg_bac4d3b8",
+          "timestamp": "2026-01-12T23:39:47.206183",
+          "speaker": "assistant",
+          "text": "It sounds like you're carrying a heavy burden. Have you been able to talk to anyone about how you're feeling?",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.911389921707138,
+            "voice_truth_gap": null,
+            "features": null
+          },
+          "cultural_context": null
+        },
+        {
+          "id": "msg_bb0d3130",
+          "timestamp": "2026-01-12T23:40:17.206209",
+          "speaker": "user",
+          "text": "I feel like I'm failing everyone",
+          "emotion": {
+            "detected": "sad",
+            "confidence": 0.7304090847609689,
+            "voice_truth_gap": 0.3145189517989431,
+            "features": null
+          },
+          "cultural_context": {
+            "patterns": [],
+            "deflection_detected": false,
+            "cultural_significance": "low",
+            "language_switches": []
+          }
+        },
+        {
+          "id": "msg_af18224a",
+          "timestamp": "2026-01-12T23:40:47.206229",
+          "speaker": "assistant",
+          "text": "Those feelings are valid, but giving up isn't the only option. Let's explore some ways to manage this stress together.",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.91998363941339,
+            "voice_truth_gap": null,
+            "features": null
+          },
+          "cultural_context": null
+        },
+        {
+          "id": "msg_78270347",
+          "timestamp": "2026-01-12T23:41:17.206277",
+          "speaker": "user",
+          "text": "Maybe I should just give up",
+          "emotion": {
+            "detected": "sad",
+            "confidence": 0.8197795640710138,
+            "voice_truth_gap": 0.4002388001331604,
+            "features": null
+          },
+          "cultural_context": {
+            "patterns": [],
+            "deflection_detected": false,
+            "cultural_significance": "low",
+            "language_switches": []
+          }
+        },
+        {
+          "id": "msg_e7235675",
+          "timestamp": "2026-01-12T23:41:47.206300",
+          "speaker": "assistant",
+          "text": "You mentioned feeling like you're failing everyone. Can you help me understand who you feel you're letting down?",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.9467556748326997,
+            "voice_truth_gap": null,
+            "features": null
+          },
+          "cultural_context": null
+        }
+      ],
+      "emotional_arc": {
+        "start_emotion": "neutral",
+        "progression": [
+          "neutral",
+          "sad",
+          "sad",
+          "sad",
+          "sad",
+          "neutral",
+          "sad",
+          "sad"
+        ],
+        "end_emotion": "sad",
+        "crisis_level": "medium"
+      },
+      "duration_minutes": 36,
+      "created_at": "2026-01-04T23:45:17.206385"
+    },
+    {
+      "id": "conv_73a192a1",
+      "user_id": "user_003",
+      "scenario": "family_issues",
+      "messages": [
+        {
+          "id": "msg_cdab6b05",
+          "timestamp": "2026-01-12T23:35:17.206631",
+          "speaker": "user",
+          "text": "My family doesn't understand me",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.7507016633796018,
+            "voice_truth_gap": 0.04477640718138533,
+            "features": null
+          },
+          "cultural_context": {
+            "patterns": [
+              "family_dynamics"
+            ],
+            "deflection_detected": false,
+            "cultural_significance": "high",
+            "language_switches": []
+          }
+        },
+        {
+          "id": "msg_9a27274f",
+          "timestamp": "2026-01-12T23:35:47.206662",
+          "speaker": "assistant",
+          "text": "Family relationships can be complex. What makes you feel like they don't understand you?",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.9227101929214394,
+            "voice_truth_gap": null,
+            "features": null
+          },
+          "cultural_context": null
+        },
+        {
+          "id": "msg_6f281b54",
+          "timestamp": "2026-01-12T23:36:17.206691",
+          "speaker": "user",
+          "text": "Wazazi wangu hawanielwi",
+          "emotion": {
+            "detected": "angry",
+            "confidence": 0.7154270935260418,
+            "voice_truth_gap": 0.16024065947438182,
+            "features": null
+          },
+          "cultural_context": {
+            "patterns": [
+              "family_dynamics"
+            ],
+            "deflection_detected": false,
+            "cultural_significance": "high",
+            "language_switches": [
+              "swahili"
+            ]
+          }
+        },
+        {
+          "id": "msg_eeebdd10",
+          "timestamp": "2026-01-12T23:36:47.206715",
+          "speaker": "assistant",
+          "text": "It sounds like there's a lot of pressure from your family. Can you share what kind of expectations they have?",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.8812110518091445,
+            "voice_truth_gap": null,
+            "features": null
+          },
+          "cultural_context": null
+        },
+        {
+          "id": "msg_391a4395",
+          "timestamp": "2026-01-12T23:37:17.206743",
+          "speaker": "user",
+          "text": "They expect too much from me",
+          "emotion": {
+            "detected": "angry",
+            "confidence": 0.6838249831225031,
+            "voice_truth_gap": 0.3077475293987325,
+            "features": null
+          },
+          "cultural_context": {
+            "patterns": [],
+            "deflection_detected": false,
+            "cultural_significance": "low",
+            "language_switches": []
+          }
+        },
+        {
+          "id": "msg_3d703e3b",
+          "timestamp": "2026-01-12T23:37:47.206764",
+          "speaker": "assistant",
+          "text": "Cultural and generational differences can create tension. What specific areas do you clash on?",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.8633404068686572,
+            "voice_truth_gap": null,
+            "features": null
+          },
+          "cultural_context": null
+        },
+        {
+          "id": "msg_7da70ff7",
+          "timestamp": "2026-01-12T23:38:17.206791",
+          "speaker": "user",
+          "text": "Siwezi live up to their expectations",
+          "emotion": {
+            "detected": "angry",
+            "confidence": 0.7696105110894736,
+            "voice_truth_gap": 0.3035329763187809,
+            "features": null
+          },
+          "cultural_context": {
+            "patterns": [],
+            "deflection_detected": false,
+            "cultural_significance": "low",
+            "language_switches": [
+              "swahili"
+            ]
+          }
+        },
+        {
+          "id": "msg_11d64585",
+          "timestamp": "2026-01-12T23:38:47.206811",
+          "speaker": "assistant",
+          "text": "Running away might feel like a solution, but let's talk about other ways to address these feelings.",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.8500825757282523,
+            "voice_truth_gap": null,
+            "features": null
+          },
+          "cultural_context": null
+        },
+        {
+          "id": "msg_dcd44bde",
+          "timestamp": "2026-01-12T23:39:17.206837",
+          "speaker": "user",
+          "text": "Sometimes I just want to run away",
+          "emotion": {
+            "detected": "angry",
+            "confidence": 0.8108023197150682,
+            "voice_truth_gap": 0.2975872625257931,
+            "features": null
+          },
+          "cultural_context": {
+            "patterns": [],
+            "deflection_detected": false,
+            "cultural_significance": "low",
+            "language_switches": []
+          }
+        },
+        {
+          "id": "msg_f90daf2a",
+          "timestamp": "2026-01-12T23:39:47.206864",
+          "speaker": "assistant",
+          "text": "Have you tried having an open conversation with your family about how their expectations affect you?",
+          "emotion": {
+            "detected": "neutral",
+            "confidence": 0.935271278482949,
+            "voice_truth_gap": null,
+            "features": null
+          },
+          "cultural_context": null
+        }
+      ],
+      "emotional_arc": {
+        "start_emotion": "neutral",
+        "progression": [
+          "neutral",
+          "angry",
+          "angry",
+          "angry",
+          "angry",
+          "neutral",
+          "angry",
+          "angry",
+          "angry",
+          "angry"
+        ],
+        "end_emotion": "angry",
+        "crisis_level": "medium"
+      },
+      "duration_minutes": 36,
+      "created_at": "2026-01-02T23:45:17.206964"
+    }
+  ]
+}

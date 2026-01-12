@@ -1,0 +1,47 @@
+# MANIFEST.in for ResonaAI Demo Data Generator
+
+# Include documentation
+include README.md
+include USAGE_GUIDE.md
+include SETUP.md
+include TROUBLESHOOTING.md
+include requirements.txt
+include setup.py
+
+# Include configuration files
+include *.yml
+include *.yaml
+include *.json
+include Dockerfile
+include docker-compose.yml
+
+# Include all Python files
+recursive-include . *.py
+
+# Include cultural knowledge data
+include cultural_knowledge.py
+
+# Include test files
+recursive-include tests *.py
+
+# Include example files
+recursive-include examples *.py
+
+# Include scripts
+recursive-include scripts *.py *.sh *.ps1
+
+# Exclude compiled Python files
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude __pycache__
+
+# Exclude development files
+exclude .gitignore
+exclude .pytest_cache
+exclude .hypothesis
+exclude *.log
+
+# Exclude distribution files
+exclude dist/*
+exclude build/*
+exclude *.egg-info/*

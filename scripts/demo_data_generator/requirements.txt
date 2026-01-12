@@ -1,0 +1,36 @@
+# Demo Data Generator Requirements
+# Core dependencies for the ResonaAI Demo Data Generator
+
+# Web Framework and API
+fastapi>=0.104.1
+uvicorn[standard]>=0.24.0
+
+# Data Validation and Configuration
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+
+# Testing Framework
+hypothesis>=6.88.1
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+
+# WebSocket Support
+websockets>=11.0.0
+
+# HTTP Client for Testing
+httpx>=0.25.0
+
+# Process Management
+psutil>=5.9.0
+
+# Development Dependencies (Optional)
+black>=23.0.0
+flake8>=6.0.0
+mypy>=1.7.0
+
+# Platform-specific dependencies
+# Windows
+pywin32>=306; sys_platform == "win32"
+
+# macOS/Linux
+# No additional platform-specific requirements
